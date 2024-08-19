@@ -1,25 +1,28 @@
 import cv2
 import os
 
-video_path = 'ruta_al_video.mp4'
-output_dir = 'frames/'
+def extract_frames(video_path, output_folder, time_interval=2):
+    # Crear la carpeta de salida si no existe
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
 
-# Crear el directorio de salida si no existe
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+    # Capturar el video
+    vidcap = cv2.VideoCapture(video_path)
+    fps = int(vidcap.get(cv2.CAP_PROP_FPS))  # Obtener la tasa de fotogramas del video
+    interval_frames = int(fps * time_interval)  # Intervalo en fotogramas
 
-cap = cv2.VideoCapture(video_path)
-frame_rate = int(cap.get(cv2.CAP_PROP_FPS))  # Obtener la tasa de frames por segundo del video
-count = 0
+    success, image = vidcap.read()
+    count = 0
+    saved_count = 0
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
-    if count % frame_rate == 0:  # Extraer un frame por segundo
-        frame_filename = os.path.join(output_dir, f'frame_{count}.jpg')
-        cv2.imwrite(frame_filename, frame)
-    count += 1
+    while success:
+        if count % interval_frames == 0:
+            cv2.imwrite(os.path.join(output_folder, f"frame_{saved_count}.jpg"), image)
+            saved_count += 1
+        success, image = vidcap.read()
+        count += 1
 
-cap.release()
-print("Extracción de frames completa.")
+    print(f"Fotogramas extraídos: {saved_count}")
+
+# Ejemplo de uso
+extract_frames("D:/Justino/Tesis/NOR hembras escopolamina completo/G1/Reconocimiento_1A.mp4", "D:/Justino/Tesis/Stuart-Backend/Frames/Reconocimiento_1A", time_interval=2)

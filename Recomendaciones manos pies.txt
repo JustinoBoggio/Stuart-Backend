@@ -1,0 +1,27 @@
+Recomendaciones manos pies
+
+
+1. Manejo de Objetos No Deseados (Manos o Pies en el Video)
+Cuando aparecen objetos no deseados como manos o pies en los videos, hay varias estrategias que puedes adoptar:
+
+Opción A: Etiquetar los Objetos No Deseados
+Etiquetar como Clase Separada: Puedes crear una etiqueta específica para estos objetos no deseados, como "hand" o "foot", y luego entrenar la red neuronal para ignorarlos o no considerarlos como parte del análisis de los ratones y los objetos de interés.
+
+Pros: Esto permite que el modelo aprenda a distinguir entre objetos relevantes y no relevantes.
+Contras: Requiere más trabajo de etiquetado y un mayor número de datos para entrenar el modelo correctamente.
+
+
+
+Opción B: Excluir Fotogramas
+Excluir Fotogramas que Contengan Manos o Pies: Otra opción es simplemente no etiquetar los fotogramas donde aparecen estos objetos, o excluirlos del conjunto de entrenamiento. Si estos objetos no aparecen frecuentemente, esta puede ser una solución sencilla y efectiva.
+
+Pros: Reduces la complejidad del modelo y evitas que aprenda patrones incorrectos.
+Contras: Podrías perder algo de información si estos fotogramas también contienen datos relevantes.
+
+
+
+Opción C: Filtrado Automático con Post-Procesamiento
+Filtrado en la Detección Final: Una vez entrenado el modelo, puedes agregar un paso de post-procesamiento que filtre o ignore cualquier detección que corresponda a objetos no deseados como manos o pies.
+
+Pros: Menos trabajo de etiquetado inicial y más flexibilidad en el ajuste fino del modelo.
+Contras: Requiere un buen algoritmo de filtrado y podría ser menos preciso.
