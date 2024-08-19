@@ -1,0 +1,28 @@
+### https://www.youtube.com/watch?v=nqmEbfysbmA
+
+#Creación entorno virtual
+conda create -n LabelImg_env #Creación de un entorno para no generar conflictos
+conda activate LabelImg_env #Activación del mismo
+Al ya tener el entorno activado, instalamos una versión de python menor a la 3.8
+conda install python=3.7.0
+#Correr estos dos comandos
+conda install pyqt=5
+conda install -c anaconda lxml
+#cd a la carpeta instalada
+D:\Justino\Tesis
+#Clonar repositorio
+git clone https://github.com/tzutalin/labelImg.git
+#Probar 
+pip install pyqt5-tools
+#Verificar que esté instalado
+pyrcc5 -h
+#Crear el script resources.py
+cd labelImg
+pyrcc5 -o resources.py resources.qrc
+#Mover el archivo resources.py  y resources.qrc rearchivo a la cartpeta libs en donde se descargó el repo
+
+#Ejecutar el programa
+Python labelImg.py
+#cd a la carpeta instalada
+cd D:\Justino\Tesis\labelImg for object detection
+python labelImg.py
