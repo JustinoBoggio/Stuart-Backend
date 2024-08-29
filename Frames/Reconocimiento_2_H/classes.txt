@@ -1,0 +1,4 @@
+objeto1
+cuerpoRaton
+cabezaRaton
+narizRaton
