@@ -1,0 +1,126 @@
+# MODEL:
+#   NAME: HRNet
+#   NUM_KEYPOINTS: 8
+#   PRETRAINED: 'pose_higher_hrnet_w32_512.pth'
+#   IMAGE_SIZE: [640, 640]  # Resolución de las imágenes
+#   HEATMAP_SIZE: [160, 160]  # Tamaño de los mapas de calor
+#   SIGMA: 2.0  # Desviación estándar para los heatmaps
+#   EXTRA:
+#     FINAL_CONV_KERNEL: 1
+#     PRETRAINED_LAYERS: ['*']
+#     STAGE2:
+#       NUM_MODULES: 1
+#       NUM_BRANCHES: 2
+#       BLOCK: BASIC
+#       NUM_BLOCKS: [4, 4]
+#       NUM_CHANNELS: [32, 64]
+#     STAGE3:
+#       NUM_MODULES: 4
+#       NUM_BRANCHES: 3
+#       BLOCK: BASIC
+#       NUM_BLOCKS: [4, 4, 4]
+#       NUM_CHANNELS: [32, 64, 128]
+#     STAGE4:
+#       NUM_MODULES: 3
+#       NUM_BRANCHES: 4
+#       BLOCK: BASIC
+#       NUM_BLOCKS: [4, 4, 4, 4]
+#       NUM_CHANNELS: [32, 64, 128, 256]
+
+# TRAIN:
+#   BATCH_SIZE: 8
+#   SHUFFLE: True
+#   EPOCHS: 100
+#   LR: 0.001
+#   OPTIMIZER: Adam
+#   WEIGHT_DECAY: 0.0001
+#   LR_SCHEDULER: StepLR
+#   STEP_SIZE: 30
+#   GAMMA: 0.1
+#   SAVE_DIR: "./outputs/models"  # Carpeta donde se guardarán los modelos
+
+# AUGMENTATION:
+#   FLIP: True
+#   ROTATION: 30  # Rotar aleatoriamente en un rango de -30 a 30 grados
+#   SCALE: [0.75, 1.25]  # Escalado aleatorio de imágenes
+#   SHIFT: 0.2  # Desplazamiento aleatorio
+#   BRIGHTNESS: 0.2
+#   CONTRAST: 0.2
+#   SATURATION: 0.2
+#   HUE: 0.1
+
+# DATASET:
+#   TRAIN: 
+#     ROOT: "C:/Users/leone/Desktop/STUART-HRnet/HRNet3/prueba/data/Train COCO/images/default"
+#     ANNOTATIONS: "C:/Users/leone/Desktop/STUART-HRnet/HRNet3/prueba/data/Train COCO/annotations/person_keypoints_default.json"
+#     IMG_SIZE: [640, 640]  # Tamaño de las imágenes (640x640)
+    
+#   VALIDATION:
+#     ROOT: "C:/Users/leone/Desktop/STUART-HRnet/HRNet3/prueba/data/Test COCO/images/default"
+#     ANNOTATIONS: "C:/Users/leone/Desktop/STUART-HRnet/HRNet3/prueba/data/Test COCO/annotations/person_keypoints_default.json"
+#     IMG_SIZE: [640, 640]  # Tamaño de las imágenes (640x640)
+
+MODEL:
+  NAME: hrnet
+  INIT_WEIGHTS: True
+  PRETRAINED: 'pose_higher_hrnet_w32_512.pth'  # Dejar vacío si no se usan pesos preentrenados
+  NUM_JOINTS: 8  # Número de puntos clave
+  IMAGE_SIZE: [640, 640]  # Tamaño de las imágenes de entrada
+  HEATMAP_SIZE: [160, 160]  # Tamaño de los mapas de calor (1/4 de la imagen)
+  SIGMA: 2
+  EXTRA:
+    PRETRAINED_LAYERS: ['*']  # Cargar todas las capas excepto las no coincidentes
+    FINAL_CONV_KERNEL: 1
+    STAGE2:
+      NUM_MODULES: 1
+      NUM_BRANCHES: 2
+      BLOCK: BASIC
+      NUM_BLOCKS: [4, 4]
+      NUM_CHANNELS: [32, 64]
+      FUSE_METHOD: SUM
+    STAGE3:
+      NUM_MODULES: 4
+      NUM_BRANCHES: 3
+      BLOCK: BASIC
+      NUM_BLOCKS: [4, 4, 4]
+      NUM_CHANNELS: [32, 64, 128]
+      FUSE_METHOD: SUM
+    STAGE4:
+      NUM_MODULES: 3
+      NUM_BRANCHES: 4
+      BLOCK: BASIC
+      NUM_BLOCKS: [4, 4, 4, 4]
+      NUM_CHANNELS: [32, 64, 128, 256]
+      FUSE_METHOD: SUM
+
+TRAIN:
+  BATCH_SIZE: 8
+  SHUFFLE: True
+  EPOCHS: 50
+  LR: 0.001
+  OPTIMIZER: Adam
+  WEIGHT_DECAY: 0.0001
+  LR_SCHEDULER: StepLR
+  STEP_SIZE: 30
+  GAMMA: 0.1
+  SAVE_DIR: "./outputs/models"
+
+AUGMENTATION:
+  FLIP: True
+  ROTATION: 30
+  SCALE: [0.75, 1.25]
+  SHIFT: 0.2
+  BRIGHTNESS: 0.2
+  CONTRAST: 0.2
+  SATURATION: 0.2
+  HUE: 0.1
+
+DATASET:
+  TRAIN:
+    ROOT: "data/Train COCO/images/default"
+    ANNOTATIONS: "data/Train COCO/annotations/person_keypoints_default.json"
+    IMG_SIZE: [640, 640]
+  VALIDATION:
+    ROOT: "data/Test COCO/images/default"
+    ANNOTATIONS: "data/Test COCO/annotations/person_keypoints_default.json"
+    IMG_SIZE: [640, 640]
