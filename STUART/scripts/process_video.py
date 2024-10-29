@@ -1549,10 +1549,10 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path):
                         extended_point = (nariz_pos[0] + direction[0] * line_length, nariz_pos[1] + direction[1] * line_length)
 
                         # Dibujar la línea en rojo
-                        cv2.line(final_frame,
-                                 (int(nariz_pos[0]), int(nariz_pos[1])),
-                                 (int(extended_point[0]), int(extended_point[1])),
-                                 line_color, 2)
+                        # cv2.line(final_frame,
+                        #          (int(nariz_pos[0]), int(nariz_pos[1])),
+                        #          (int(extended_point[0]), int(extended_point[1])),
+                        #          line_color, 2)
 
             # Mostrar el frame procesado
             cv2.imshow('Detecciones Combinadas', final_frame)
