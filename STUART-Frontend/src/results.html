@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style_results.css">
+    <title>Resultados Video</title>
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <!-- Título Principal -->
+    <h1 class="title">RESULTADOS <span id="video-name">"Nombre del Video"</span></h1>
+
+    <!-- Contenedor de resultados -->
+    <div class="results-container">
+      <!-- Carrusel -->
+      <div class="carousel-container">
+        <button class="arrow left">&lt;</button>
+        <div class="carousel">
+          <!-- Los ítems se generarán dinámicamente -->
+        </div>
+        <button class="arrow right">&gt;</button>
+      </div>
+
+      <!-- Sección de datos -->
+      <div class="data-container">
+
+          <!-- Tabla y campos -->
+          <div class="table-container">
+            <h2>Tiempos de Curiosidad</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre Video</th>
+                        <th>Keypoint</th>
+                        <th>Objeto de interés</th>
+                        <th>Tiempo de Curiosidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Contenido dinámico -->
+                </tbody>
+            </table>
+            <div class="table-summary">Tiempo total: 0 segundos</div>
+
+            <!-- Campos -->
+            <div class="fields-container">
+                <div class="field-group">
+                    <label>Distancia Total Recorrida:</label>
+                    <input type="text" id="total-distance" readonly value="0"> metros
+                </div>
+                <div class="field-group">
+                    <label>Distancia Total Recorrida en Área Central:</label>
+                    <input type="text" id="central-distance" readonly value="0"> metros
+                </div>
+                <div class="field-group">
+                    <label>Tiempo dentro de Área Central:</label>
+                    <input type="text" id="central-time" readonly value="0"> segundos
+                </div>
+                <div class="field-group">
+                    <label>N° de entradas en Área Central:</label>
+                    <input type="text" id="central-entries" readonly value="0">
+                </div>
+                <div class="field-group">
+                    <label>N° de salidas del Área Central:</label>
+                    <input type="text" id="central-exits" readonly value="0">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Imagen -->
+        <div class="image-container">
+          <h2>Mapa de trayectoria Nariz</h2>
+          <img src="" alt="Mapa de trayectoria">         
+        </div>
+          
+      </div>
+
+      <!-- Botones finales -->
+      <div class="button-container">
+          <button class="button back" onclick="window.location.href='index.html'">Volver al Menú Inicial</button>
+          <button class="button new" onclick="window.location.href='new_video.html'">Procesar Nuevo Video</button>
+      </div>
+    </div>
+
+    <script src="script_results.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

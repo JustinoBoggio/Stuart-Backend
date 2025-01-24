@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style_new_video.css">
+    <title>STUART - Cargar Video</title>
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <h1 class="title">CARGA DE VIDEO</h1>
+    <!-- Página de nuevo video -->
+    <div class="new-video-page">   
+        <div class="main-container">
+            <!-- Cuadrante izquierdo -->
+            <div class="left-section">
+                <!-- Campo Raza -->
+                <div class="input-group">
+                    <label for="breed">Raza:</label>
+                    <div class="field-group">
+                        <select id="breed">
+                            <option value="raza1">Raza 1</option>
+                            <option value="raza2">Raza 2</option>
+                        </select>
+                        <button class="add-button" onclick="openModal('breed')">+</button>
+                    </div>
+                </div>
+            
+                <!-- Campo Sexo -->
+                <div class="input-group">
+                    <label for="gender">Sexo:</label>
+                    <select id="gender">
+                        <option value="Macho">Macho</option>
+                        <option value="Hembra">Hembra</option>
+                    </select>
+                </div>
+            
+                <!-- Campo Aplicación Dosis -->
+                <div class="input-group">
+                    <label for="dose">Aplicación Dosis:</label>
+                    <select id="dose" onchange="toggleDoseFields()">
+                        <option value="Sin Dosis">Sin Dosis</option>
+                        <option value="Dosis Aplicada">Dosis Aplicada</option>
+                    </select>
+                </div>
+            
+                <!-- Campos adicionales para dosis aplicada -->
+                <div class="dose-fields hidden">
+                    <!-- Campo Dosis -->
+                    <div class="input-group">
+                        <label for="dose-list">Dosis:</label>
+                        <div class="field-group">
+                            <select id="dose-list">
+                                <option value="dosis1">Dosis 1</option>
+                                <option value="dosis2">Dosis 2</option>
+                            </select>
+                            <button class="add-button" onclick="openModal('dose')">+</button>
+                        </div>
+                    </div>
+            
+                    <!-- Campo Cantidad -->
+                    <div class="input-group">
+                        <label for="dose-amount">Cantidad:</label>
+                        <input type="number" step="0.01" id="dose-amount" placeholder="Cantidad (en decimales)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cuadrante derecho -->
+            <div class="right-section">
+                <div id="file-input-container">
+                    <input type="file" id="file-input" onchange="displayFileDetails()" style="display: none;">
+                </div>
+                <div class="file-upload-box" id="file-upload-box">
+                    <label for="file-input">
+                        <span>+</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones finales -->
+        <div class="button-container">
+            <button class="back-button" onclick="goBack()">Atrás</button>
+            <button class="process-button" onclick="startProcessing()">Procesar</button>
+        </div>
+    </div>
+
+    <!-- Modal genérico para agregar raza o dosis -->
+    <div id="modal-container" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modal-title">Nueva Raza</h2>
+            <input type="text" id="modal-input" placeholder="Ingrese el nombre">
+            <div class="modal-buttons">
+                <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="modal-confirm" onclick="confirmModal()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para la barra de carga y el botón de cancelar -->
+
+    <div id="progress-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header progressing">Procesando Video</div>
+            <p><strong>Progreso:</strong> <span id="progress-percentage-text">0%</span> completado</p>
+            <p><strong>Tiempo estimado restante:</strong> <span id="estimated-time">00:00:00</span></p>       
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar">
+                    <span id="progress-percentage-bar" class="progress-percentage">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para cuando terminó de procesar el video -->
+    <div id="completionModal" class="modal hidden">
+        <div class="modal-content success">
+            <div class="modal-header">¡Finalizado!</div>
+            <p>El video se procesó con éxito.</p>
+            <p>¿Qué deseas hacer a continuación?</p>
+            <div class="modal-buttons">
+                <button class="modal-confirm" onclick="redirectToResults()">Ver resultados</button>
+                <button class="modal-confirm" onclick="uploadAnotherVideo()">Subir otro video</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Éxito -->
+    <div id="success-modal" class="modal hidden">
+        <div class="modal-content success">
+            <div class="modal-header">Éxito</div>
+            <p id="success-message"></p>
+            <button class="modal-close" onclick="closeSuccessModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Alerta -->
+    <div id="alert-modal" class="modal hidden">
+        <div class="modal-content alert">
+            <div class="modal-header">Alerta</div>
+            <p id="alert-message"></p>
+            <button class="modal-close" onclick="closeAlertModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Error -->
+    <div id="error-modal" class="modal hidden">
+        <div class="modal-content error">
+            <div class="modal-header">Error</div>
+            <p id="error-message"></p>
+            <button class="modal-close" onclick="closeErrorModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="script_new_video.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

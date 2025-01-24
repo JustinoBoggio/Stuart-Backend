@@ -1,0 +1,186 @@
+.library-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+/* Título y cuadro de búsqueda alineados */
+.header-with-search {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2%;
+}
+
+.header-with-search h2 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+.header-with-search input {
+    padding: 8px 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 300px;
+}
+
+/* Grilla de videos */
+.video-list {
+    max-height: 305px;
+    overflow-y: scroll; /* Fuerza la barra de desplazamiento vertical */
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+/* Encabezados de las columnas */
+.video-header {
+    display: grid;
+    grid-template-columns: 50px 2fr 110px 130px 130px 150px; /* Ajusta las proporciones según los datos */
+    font-weight: bold;
+    text-align: center; /* Centra horizontalmente el texto */
+    padding: 10px 0;
+    border-bottom: 2px solid #ccc;
+    align-items: center; /* Centra verticalmente el texto */
+    overflow: hidden;
+}
+
+.video-header div {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente el texto */
+    align-items: center; /* Centra verticalmente el texto */
+    padding: 0 10px;
+}
+
+.video-item {
+    display: grid;
+    grid-template-columns: 50px 2fr 110px 130px 130px 150px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.video-item div {
+    padding: 0 10px;
+}
+
+
+/* Ocultar columnas en resoluciones más pequeñas */
+@media (max-width: 1200px) {
+    .video-header div:nth-child(5), /* Columna "Dosis" */
+    .video-item div:nth-child(5) {
+        display: none;
+    }
+
+    .video-header {
+        grid-template-columns: 70px 2fr 120px 120px 200px; /* Ajustar el diseño */
+    }
+
+    .video-item {
+        grid-template-columns: 70px 2fr 120px 120px 200px;
+    }
+}
+
+@media (max-width: 900px) {
+    .video-header div:nth-child(4), /* Columna "Raza" */
+    .video-item div:nth-child(4) {
+        display: none;
+    }
+
+    .video-header {
+        grid-template-columns: 70px 2fr 120px 120px; /* Ajustar el diseño */
+    }
+
+    .video-item {
+        grid-template-columns: 70px 2fr 120px 120px;
+    }
+}
+
+@media (max-width: 600px) {
+    .video-header div:nth-child(3), /* Columna "Sexo" */
+    .video-item div:nth-child(3) {
+        display: none;
+    }
+
+    .header-with-search input {
+        width: 150px; /* Reduce el ancho del cuadro de búsqueda */
+    }
+
+    .video-header {
+        grid-template-columns: 50px 1fr 100px; /* Ajustar el diseño */
+    }
+
+    .video-item {
+        grid-template-columns: 50px 1fr 100px;
+    }
+}
+
+.video-icon {
+    text-align: center;
+    font-size: 1.5em;
+    color: #3498db;
+}
+
+/* Botón "Atrás" */
+.back-button {
+    display: block;
+    margin: 20px auto;
+    max-width: 200px; /* Igual ancho que los botones en index.html */
+    background-color: #e74c3c;
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.back-button:hover {
+    background-color: #c0392b;
+}
+
+/* Contenedor para las acciones */
+.actions-container {
+    display: flex;
+    justify-content: space-around; /* Espaciado uniforme entre los íconos */
+    align-items: center;
+    width: auto; /* Ajusta el ancho al contenido, evita desplazamiento horizontal */
+    gap: 10px; /* Espaciado más pequeño entre los íconos */
+}
+
+/* Ícono de ojo */
+.actions-container .view-results-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #3498db; /* Azul para el ojo */
+    font-size: 16px; /* Ajusta el tamaño del ícono */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actions-container .view-results-button:hover {
+    color: #2980b9; /* Azul más oscuro al pasar el mouse */
+}
+
+/* Ícono de cesto de basura */
+.actions-container .delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #e74c3c; /* Rojo para el cesto */
+    font-size: 16px; /* Ajusta el tamaño del ícono */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actions-container .delete-button:hover {
+    color: #c0392b; /* Rojo más oscuro al pasar el mouse */
+}
