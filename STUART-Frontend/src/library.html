@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style_library.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-...." crossorigin="anonymous" />
+  
+</head>
+
+<body>
+    <!-- Header -->
+    <div id="header-container"></div>
+
+    <div class="library-container">
+        <div class="header-with-search">
+            <h2>Videos Procesados</h2>
+            <input type="text" id="searchBar" placeholder="Buscar por nombre de video..." oninput="filterVideos()">
+        </div>
+    
+        <!-- Lista de videos -->
+        <div class="video-list">
+            <div class="video-header">
+                <div></div>
+                <div>Video</div>
+                <div>Sexo</div>
+                <div>Raza</div>
+                <div>Dosis</div>
+                <div>Acción</div>
+            </div>
+
+            <!-- Lista de videos -->
+            <div id="videoList">
+                <!-- Filas de videos se agregarán aquí dinámicamente con JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <button class="back-button" onclick="goBack()">Atrás</button>
+
+    <script src="script_library.js" defer></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
+
+
+

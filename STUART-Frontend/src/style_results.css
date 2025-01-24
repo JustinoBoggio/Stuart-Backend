@@ -1,0 +1,275 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@333&display=swap');
+
+/* Estilo general */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+h1 {
+  text-align: center;
+  align-items: center;
+  margin-top: 20px; /* Ajusta el valor según el espacio deseado */
+}
+
+h1.text {
+  font-family: "Lexend", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  margin-bottom: 20px; /* Añade espacio debajo del título */
+}
+
+.results-container {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Carrusel */
+.carousel-container {
+  display: flex;
+  align-items: center; /* Centra verticalmente los elementos */
+  justify-content: flex-start; /* Alinea los elementos al principio */
+  overflow: hidden; /* Oculta los elementos fuera del contenedor */
+  width: 70%; /* Reduce el ancho */
+  margin: 0 auto; /* Centra horizontalmente el carrusel */
+  position: relative; /* Asegura que las flechas estén dentro del contexto */
+  margin-bottom: 5%;
+}
+
+.carousel {
+  display: flex;
+  width: 100%; /* Ocupa todo el ancho */
+  transition: transform 0.5s ease-in-out; /* Suaviza el movimiento */
+}
+
+.carousel-item.active {
+  display: block; /* Solo los elementos visibles tendrán display: block */
+  flex: 0 0 100%; /* Cada elemento ocupa el 100% del carrusel */
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 10px;
+  box-sizing: border-box; /* Incluye relleno y borde en el ancho */
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.carousel-item {
+  display: none; /* Oculta todos los elementos por defecto */
+}
+
+/* Asegura que las flechas estén centradas y no se vean afectadas por el tamaño del contenedor */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2em;
+  font-weight: bold;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.arrow.left {
+  left: 10px;
+}
+
+.arrow.right {
+  right: 10px;
+}
+
+.arrow:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Sección de datos */
+.data-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Imagen */
+.image-container {
+  flex: 1;
+  text-align: center;
+}
+
+.image-container img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+/* Tabla */
+.table-container {
+  flex: 1;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-container th,
+.table-container td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.table-container th {
+  background-color: #f4f4f4;
+}
+
+.table-summary {
+  font-weight: bold;
+  text-align: right;
+  margin-top: 10px;
+}
+
+/* Campos debajo de la tabla */
+.fields-container {
+  margin-top: 7%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.field-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.field-group label {
+  font-weight: bold;
+}
+
+.field-group input {
+  flex: 1;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+input[readonly] {
+  color: #555;
+  cursor: not-allowed;
+}
+
+/* Botones */
+.button-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.button {
+  padding: 10px 20px;
+  font-size: 1em;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button.back {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.button.back:hover {
+  background-color: #2980b9;
+}
+
+.button.new {
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+.button.new:hover {
+  background-color: #27ae60;
+}
+
+/* --- Media Queries para hacer el diseño responsive --- */
+
+/* Pantallas menores a 800px */
+@media (max-width: 800px) {
+  /* Centrar el carrusel y reducir su tamaño */
+  .carousel-container {
+    width: 90%; /* Se adapta al ancho disponible */
+  }
+
+  .arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5em;
+  }
+
+  .arrow.left {
+      left: 10px;
+  }
+
+  .arrow.right {
+      right: 10px;
+  }
+
+  /* Cambia el diseño de columnas a filas */
+  .data-container {
+    flex-direction: column;
+  }
+
+  /* Reorganiza el orden de los contenedores */
+  .image-container {
+    order: 1;
+  }
+
+  .table-container {
+    order: 2;
+  }
+
+  .button-container {
+    order: 3;
+    gap: 10px;
+    margin-top: 10%;
+  }
+}
+
+/* Pantallas menores a 500px */
+@media (max-width: 500px) {
+  .carousel-container {
+    width: 80%; /* Ocupa todo el ancho */
+  }
+
+  .carousel-item {
+    font-size: 1em; /* Ajusta el tamaño del texto */
+    padding: 5px; /* Reduce el padding */
+  }
+
+  .arrow {
+    width: 30px; /* Flechas más pequeñas */
+    height: 30px;
+    font-size: 1.5rem;
+  }
+}
