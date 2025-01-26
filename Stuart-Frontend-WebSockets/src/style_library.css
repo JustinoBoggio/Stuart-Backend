@@ -1,0 +1,134 @@
+/* Estilos generales */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+}
+
+
+.header-container{
+    display: flex;
+    flex-direction: column;
+  }
+
+  .date-container{
+    text-align: right;
+    justify-content: right;
+    margin-top: 10px;
+    margin-right: 2%;
+  }
+
+.library-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+/* Estilos de la lista de videos 
+.video-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.video-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.video-icon {
+    margin-right: 10px;
+}*/
+
+/* Estilos para la lista de videos y filas */
+.video-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.video-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.video-icon {
+    margin-right: 10px;
+}
+
+/* Estilos para los elementos dentro de cada fila */
+.video-item > div {
+    margin-right: 150px; /* Ajusta el espacio entre los elementos */
+}
+
+/* Estilos del botón Atrás */
+button {
+    margin-top: 20px;
+    background-color: #3498db;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #297fb8;
+}
+
+.back-button{
+    background-color: #e74c3c;
+    color: #ffffff;
+  }
+
+  /* Estilos para el botón de eliminar (icono) */
+.delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: grey; /* Color gris para el botón de eliminar */
+}
+
+.delete-button:hover {
+    background: none;
+    color: #c0392b; /* Cambia de color al pasar el mouse */
+}
+
+
+/* Estilos para el modal */
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.modal-content button {
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+#cancelBtn{
+    background-color: #e74c3c;
+    color: #ffffff;
+}
+/* ... Estilos anteriores ... */

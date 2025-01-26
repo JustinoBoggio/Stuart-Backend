@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style_library.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-...." crossorigin="anonymous" />
+    <script src="script_library.js" defer></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header-container">
+        <object type="text/html" data="header.html"></object>
+    </div>
+
+    <!-- Contenido de la página -->
+    <div class="date-container">
+        <span id="current-date"></span>
+    </div>
+
+    <div class="library-container">
+        <h2>Biblioteca</h2>
+        <!-- Lista de videos -->
+        <div class="video-list" id="videoList">
+            <!-- Filas de videos se agregarán aquí dinámicamente con JavaScript -->
+        </div>
+
+        <!-- Botón Atrás -->
+        <button class="back-button" onclick="goBack()">Atrás</button>
+    </div>
+</body>
+
+</html>

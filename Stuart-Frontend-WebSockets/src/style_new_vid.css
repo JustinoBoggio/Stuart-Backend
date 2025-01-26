@@ -1,0 +1,180 @@
+/* style.css para new_video.html */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .new-video-page {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .new-video-page h1 {
+    text-align: center;
+  }
+  
+  .file-upload-container {
+    display: flex;
+    margin-bottom: 20px;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .file-upload-box {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center; /* Centra tanto horizontal como verticalmente */
+    padding: 50px;
+    border: 2px dashed #000000;
+    background-color: rgb(226, 220, 220);
+    border-radius: 10px;
+    text-align: center;
+    margin-right: 10px;
+    width: 100%;
+    height: 100%;
+  }
+  
+
+  .file-upload-box label {
+    display: block;
+    cursor: pointer;
+    border-radius: 100%; /* Hace que el botón sea circular */
+    background-color: #3498db; /* Color de fondo azul claro */
+    padding: 20px; /* Ajusta el tamaño del botón según sea necesario */
+    color: #ffffff; /* Color del texto */
+    align-items: center;
+    justify-content: center;
+    text-align: center; /* Asegura que el texto esté centrado */
+  }
+  
+  .file-upload-box span {
+    font-size: 20px; /* Tamaño del símbolo "+" */
+    line-height: 1; /* Ajusta la altura de línea según sea necesario */
+    align-items: center;
+  }
+  
+  
+  .file-upload-box input {
+    display: none;
+  }
+  
+  .breed-input-container,
+  .dosis-input-container,
+  .checkboxes {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .breed-input-container {
+    flex: 1;
+    flex-direction: column;
+    margin-right: 20px;
+  }
+
+  .dosis-input-container {
+    flex: 1;
+    flex-direction: column;
+    margin-top : 1%;
+    margin-right: 20px;
+  }
+  
+  .checkboxes {
+    flex-direction: column;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .button-container button {
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .button-container button{
+    transition: all .5s ease-in-out;
+    display: block;
+  }
+
+  .button-container button:hover{
+    transform: scale(1.3);
+  }
+  .back-button {
+    background-color: #e74c3c;
+    color: #ffffff;
+  }
+  
+  .process-button {
+    background-color: #2ecc71;
+    color: #ffffff;
+  }
+  
+  /* Aplicar espacio inferior a los inputs directamente */
+input {
+  margin-bottom: 10px;
+}
+
+label {
+  margin-bottom: 10px;
+}
+
+/* Estilos del modal */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#progress-bar {
+  width: 100%;
+  background-color: #f3f3f3;
+}
+
+#progress-bar-fill {
+  width: 0;
+  height: 30px;
+  background-color: #4caf50;
+}

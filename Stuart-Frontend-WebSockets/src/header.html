@@ -1,0 +1,32 @@
+<!-- header.html -->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="images/logoStuart.png" alt="Logo Stuart" onclick="redirectToIndex()">
+            <img src="images/logoCerela.png" alt="Logo Cerela" onclick="redirectToIndex()">
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar...">
+            <button type="button">Buscar</button>
+        </div>
+    </header>
+    <script>
+        function redirectToIndex() {
+        // Cambia 'otraPagina.html' por la URL de la página a la que deseas redirigir
+        window.location.href = 'index.html';
+      }
+    </script>
+</body>
+
+
+</html>
