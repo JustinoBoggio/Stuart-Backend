@@ -404,7 +404,6 @@ def post_processing(keypoint_trajectories,
 
 
 def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, progress_callback=None):
-
     # Crear un directorio temporal para los mapas de trayectoria
     # Cuando el bloque `with` termina, el directorio temporal y su contenido se eliminan automáticamente.
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -924,6 +923,7 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, prog
                 # Imprime los resultados
                 print(f"Progreso en variable: {progress_percentage:.2f}%, Tiempo restante en variable: {remaining_time_str}")
                 if progress_callback:
+                    print(f"Calling progress callback with: {progress_percentage}%")
                     progress_callback(progress_percentage)
 
                 # Salir con 'q'

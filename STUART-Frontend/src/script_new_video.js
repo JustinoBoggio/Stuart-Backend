@@ -10,6 +10,23 @@ socket.on('disconnect', () => {
   console.log('Desconectado del servidor de WebSockets');
 });
 
+socket.on('progress_update', (progressData) => {
+  console.log('Progreso recibido:', progressData);
+  if (progressData && typeof progressData.progress !== 'undefined') {
+    updateProgressBar(progressData.progress);
+  } else {
+    console.error('Datos de progreso no válidos recibidos:', progressData);
+  }
+});
+
+// Emitir un evento de prueba
+socket.emit('test_event', { test: 'data' });
+
+// Escuchar el evento de respuesta del servidor
+socket.on('test_response', (data) => {
+    console.log('Respuesta del servidor:', data);
+});
+
 // Función para alternar los campos adicionales de dosis
 function toggleDoseFields() {
   const doseFields = document.querySelector('.dose-fields');
@@ -233,11 +250,6 @@ function startProcessing() {
   formData.append('doseList', doseList);
   formData.append('doseAmount', doseAmount);
 
-  // Configurar el listener de progreso antes de enviar el video
-  socket.on('progress_update', (progressData) => {
-    console.log('Progreso recibido:', progressData);
-    updateProgressBar(progressData.progress);
-  });
 
   // Luego, realiza la solicitud para cargar el video
   fetch('http://127.0.0.1:5000/upload_video', {
@@ -255,16 +267,6 @@ function startProcessing() {
   .catch(error => {
     console.error('Error en la solicitud:', error);
   });
-}
-
-function updateProgressWithBackendData(progress) {
-    const progressBar = document.getElementById('progress-bar');
-    const progressPercentageText = document.getElementById('progress-percentage-text');
-    const progressPercentageBar = document.getElementById('progress-percentage-bar');
-
-    progressBar.style.width = `${progress}%`;
-    progressPercentageText.innerText = `${Math.floor(progress)}%`;
-    progressPercentageBar.innerText = `${Math.floor(progress)}%`;
 }
 
 function updateProgressBar(progress) {
