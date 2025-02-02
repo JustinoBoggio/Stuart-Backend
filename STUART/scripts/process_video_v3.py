@@ -912,19 +912,26 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, prog
                 # Obtén el progreso en porcentaje
                 progress_percentage = (pbar.n / total_frames) * 100
 
-                # Intenta obtener el tiempo restante desde tqdm
-                remaining_time = pbar.format_dict.get('remaining', None)
-                if remaining_time is None:
-                    remaining_time_str = "calculando..."
+                # Calcula el tiempo transcurrido
+                elapsed_time = time.time() - start_time
+
+                # Calcula el tiempo restante estimado
+                if pbar.n > 0:  # Evita la división por cero
+                    avg_time_per_frame = elapsed_time / pbar.n
+                    time_remaining = avg_time_per_frame * (total_frames - pbar.n)
                 else:
-                    # Convierte el tiempo restante a una representación legible
-                    remaining_time_str = f"{int(remaining_time // 3600):02}:{int((remaining_time % 3600) // 60):02}:{int(remaining_time % 60):02}"
+                    time_remaining = 0
+
+                # Convierte el tiempo restante a un formato legible (horas:minutos:segundos)
+                hours, remainder = divmod(int(time_remaining), 3600)
+                mins, secs = divmod(remainder, 60)
+                time_remaining_formatted = f"{hours:02}:{mins:02}:{secs:02}"
 
                 # Imprime los resultados
-                print(f"Progreso en variable: {progress_percentage:.2f}%, Tiempo restante en variable: {remaining_time_str}")
+                print(f"Progreso en variable: {progress_percentage:.2f}%, Tiempo restante en variable: {time_remaining_formatted}")
                 if progress_callback:
-                    print(f"Calling progress callback with: {progress_percentage}%")
-                    progress_callback(progress_percentage)
+                    print(f"Calling progress callback with: {progress_percentage}%, Remaining Time: {time_remaining_formatted}")
+                    progress_callback(progress_percentage, time_remaining_formatted)
 
                 # Salir con 'q'
                 if cv2.waitKey(1) & 0xFF == ord('q'):

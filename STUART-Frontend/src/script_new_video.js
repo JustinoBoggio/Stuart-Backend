@@ -14,17 +14,14 @@ socket.on('progress_update', (progressData) => {
   console.log('Progreso recibido:', progressData);
   if (progressData && typeof progressData.progress !== 'undefined') {
     updateProgressBar(progressData.progress);
+
+    // Actualiza el tiempo restante si está disponible
+    if (typeof progressData.remaining_time !== 'undefined') {
+      updateRemainingTime(progressData.remaining_time);
+    }
   } else {
     console.error('Datos de progreso no válidos recibidos:', progressData);
   }
-});
-
-// Emitir un evento de prueba
-socket.emit('test_event', { test: 'data' });
-
-// Escuchar el evento de respuesta del servidor
-socket.on('test_response', (data) => {
-    console.log('Respuesta del servidor:', data);
 });
 
 // Función para alternar los campos adicionales de dosis
@@ -269,6 +266,16 @@ function startProcessing() {
   });
 }
 
+function updateRemainingTime(remainingTime) {
+  const estimatedTime = document.getElementById('estimated-time');
+  if (estimatedTime) {
+    // Actualiza el texto del elemento HTML con el tiempo restante recibido
+    estimatedTime.innerText = remainingTime;
+  } else {
+    console.error('Elemento con ID "estimated-time" no encontrado.');
+  }
+}
+
 function updateProgressBar(progress) {
   const progressBar = document.getElementById('progress-bar');
   const progressPercentageText = document.getElementById('progress-percentage-text');
@@ -285,36 +292,6 @@ function updateProgressBar(progress) {
       finishProcessing();
   }
 }
-
-// function updateProgressBar() {
-//     const currentTime = Date.now();
-//     const elapsedTime = (currentTime - startTime) / 1000; // Tiempo transcurrido en segundos
-//     const remainingTime = Math.max(0, estimatedTotalTime - elapsedTime); // Tiempo restante en segundos
-
-//     // Calcula el progreso como porcentaje dinámico
-//     const progress = Math.min(100, (elapsedTime / estimatedTotalTime) * 100);
-//     const progressBar = document.getElementById('progress-bar');
-//     const progressPercentageText = document.getElementById('progress-percentage-text');
-//     const progressPercentageBar = document.getElementById('progress-percentage-bar');
-//     const estimatedTime = document.getElementById('estimated-time');
-
-//     // Actualiza la barra de progreso y el texto
-//     progressBar.style.width = `${progress}%`;
-//     progressPercentageText.innerText = `${Math.floor(progress)}%`;
-//     progressPercentageBar.innerText = `${Math.floor(progress)}%`;
-
-//     // Convierte el tiempo restante a hh:mm:ss
-//     const hours = Math.floor(remainingTime / 3600);
-//     const minutes = Math.floor((remainingTime % 3600) / 60);
-//     const seconds = Math.floor(remainingTime % 60);
-//     estimatedTime.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-//     // Si se alcanza el 100% de progreso, se finaliza el procesamiento
-//     if (progress >= 100) {
-//         clearInterval(processingInterval);
-//         finishProcessing();
-//     }
-// }
 
 function finishProcessing() {
     const progressModal = document.getElementById('progress-modal');
