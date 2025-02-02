@@ -1,3 +1,29 @@
+const socket = io('http://127.0.0.1:5000');
+
+// Verifica cuando el cliente se conecta al servidor de WebSockets
+socket.on('connect', () => {
+  console.log('Conectado al servidor de WebSockets');
+});
+
+// Verifica cuando el cliente se desconecta del servidor de WebSockets
+socket.on('disconnect', () => {
+  console.log('Desconectado del servidor de WebSockets');
+});
+
+socket.on('progress_update', (progressData) => {
+  console.log('Progreso recibido:', progressData);
+  if (progressData && typeof progressData.progress !== 'undefined') {
+    updateProgressBar(progressData.progress);
+
+    // Actualiza el tiempo restante si está disponible
+    if (typeof progressData.remaining_time !== 'undefined') {
+      updateRemainingTime(progressData.remaining_time);
+    }
+  } else {
+    console.error('Datos de progreso no válidos recibidos:', progressData);
+  }
+});
+
 // Función para alternar los campos adicionales de dosis
 function toggleDoseFields() {
   const doseFields = document.querySelector('.dose-fields');
@@ -199,51 +225,72 @@ function startProcessing() {
   const progressModal = document.getElementById('progress-modal');
   const fileInput = document.getElementById('file-input');
 
-  // Verifica si hay un archivo cargado
   if (!fileInput.files || fileInput.files.length === 0) {
-      // Mostrar mensaje de error si no hay archivo
       showErrorModal("Por favor, carga un video antes de iniciar el procesamiento.");
-      return; // Salir de la función si no hay video
+      return;
   }
 
-  // Si hay un archivo, iniciar el procesamiento
-  progressModal.classList.remove('hidden'); // Muestra el modal
+  progressModal.classList.remove('hidden');
 
-  startTime = Date.now(); // Marca de tiempo inicial
-  progress = 0; // Reinicia el progreso
+  const videoFile = fileInput.files[0];
+  const breed = document.getElementById('breed').value;
+  const gender = document.getElementById('gender').value;
+  const dose = document.getElementById('dose').value;
+  const doseList = document.getElementById('dose-list').value;
+  const doseAmount = document.getElementById('dose-amount').value;
 
-  // Inicia el intervalo para actualizar la barra de progreso
-  processingInterval = setInterval(updateProgressBar, 100); // Actualización cada 100 ms
+  let formData = new FormData();
+  formData.append('videoFile', videoFile);
+  formData.append('breed', breed);
+  formData.append('gender', gender);
+  formData.append('dose', dose);
+  formData.append('doseList', doseList);
+  formData.append('doseAmount', doseAmount);
+
+
+  // Luego, realiza la solicitud para cargar el video
+  fetch('http://127.0.0.1:5000/upload_video', {
+    method: 'POST',
+    body: formData,
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 'success') {
+        console.log('El video se está procesando en el backend.');
+    } else {
+        console.error('Error al procesar el video:', data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error en la solicitud:', error);
+  });
 }
 
-function updateProgressBar() {
-    const currentTime = Date.now();
-    const elapsedTime = (currentTime - startTime) / 1000; // Tiempo transcurrido en segundos
-    const remainingTime = Math.max(0, estimatedTotalTime - elapsedTime); // Tiempo restante en segundos
+function updateRemainingTime(remainingTime) {
+  const estimatedTime = document.getElementById('estimated-time');
+  if (estimatedTime) {
+    // Actualiza el texto del elemento HTML con el tiempo restante recibido
+    estimatedTime.innerText = remainingTime;
+  } else {
+    console.error('Elemento con ID "estimated-time" no encontrado.');
+  }
+}
 
-    // Calcula el progreso como porcentaje dinámico
-    const progress = Math.min(100, (elapsedTime / estimatedTotalTime) * 100);
-    const progressBar = document.getElementById('progress-bar');
-    const progressPercentageText = document.getElementById('progress-percentage-text');
-    const progressPercentageBar = document.getElementById('progress-percentage-bar');
-    const estimatedTime = document.getElementById('estimated-time');
+function updateProgressBar(progress) {
+  const progressBar = document.getElementById('progress-bar');
+  const progressPercentageText = document.getElementById('progress-percentage-text');
+  const progressPercentageBar = document.getElementById('progress-percentage-bar');
 
-    // Actualiza la barra de progreso y el texto
-    progressBar.style.width = `${progress}%`;
-    progressPercentageText.innerText = `${Math.floor(progress)}%`;
-    progressPercentageBar.innerText = `${Math.floor(progress)}%`;
+  // Actualiza la barra de progreso y el texto
+  progressBar.style.width = `${progress}%`;
+  progressPercentageText.innerText = `${Math.floor(progress)}%`;
+  progressPercentageBar.innerText = `${Math.floor(progress)}%`;
 
-    // Convierte el tiempo restante a hh:mm:ss
-    const hours = Math.floor(remainingTime / 3600);
-    const minutes = Math.floor((remainingTime % 3600) / 60);
-    const seconds = Math.floor(remainingTime % 60);
-    estimatedTime.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-    // Si se alcanza el 100% de progreso, se finaliza el procesamiento
-    if (progress >= 100) {
-        clearInterval(processingInterval);
-        finishProcessing();
-    }
+  // Si se alcanza el 100% de progreso, se finaliza el procesamiento
+  if (progress >= 100) {
+      clearInterval(processingInterval);
+      finishProcessing();
+  }
 }
 
 function finishProcessing() {
