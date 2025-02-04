@@ -1,0 +1,198 @@
+/* recovery.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@333&display=swap'); 
+
+/* Diseño global similar a login */
+body {
+    font-family: "Lexend", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-weight: normal;
+    background-color: #f4f4f4;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  /* Contenedor principal de recuperación */
+  .recovery-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 400px;
+  }
+  
+  .recovery-container h2 {
+    margin-bottom: 20px;
+  }
+  
+  /* Formulario */
+  #recovery-form label {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  #recovery-form input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  #recovery-form button {
+    font-family: "Lexend", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-weight: normal;
+    width: 90%;
+    padding: 10px;
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  #recovery-form button:hover {
+    background: #2ecc71;
+  }
+  
+  /* Modales y PopUps */
+  .modal,
+  .popup {
+    display: none; /* Ocultos por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .popup.hidden {
+    display: none;
+  }
+  
+  .modal-content,
+  .popup-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    margin: auto;
+  }
+  
+  /* Botón dentro del modal o popup */
+  .popup-content button {
+    font-family: "Lexend", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-weight: normal;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #27aa5d;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .popup-content button:hover {
+    background: #239954;
+  }
+
+  .modal-content.error button,
+  .modal-content.BadCode button,
+  .modal-content.TimeEnded button {
+    font-family: "Lexend", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-weight: normal;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .modal-content.error button:hover,
+  .modal-content.BadCode button:hover,
+  .modal-content.TimeEnded button:hover {
+    background-color: #c0392b;
+  }
+
+  .modal-content.success button {
+    font-family: "Lexend", serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-weight: normal;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #27aa5d;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .modal-content.success button:hover {
+    background: #239954;
+  }
+  
+  /* PopUp de Código */
+  .code-inputs {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+  }
+  
+  .code-digit {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Contador */
+  #countdown-timer {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  /* PopUp para Nueva Contraseña */
+  #new-pass-popup label {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  #new-pass-popup input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
