@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style_recovery.css" />
+  <title>STUART - Recuperar Contraseña</title>
+</head>
+<body>
+    <div class="recovery-container">
+        <h2>RECUPERAR CONTRASEÑA</h2>
+        <form id="recovery-form">
+        <label for="recovery-email">Ingrese su correo electrónico</label>
+        <input
+            type="email"
+            id="recovery-email"
+            placeholder="Correo electrónico"
+            required
+        />
+        <button type="submit">Recuperar Contraseña</button>
+        </form>
+    </div>
+
+    <!-- Modal de Advertencia (Mail no registrado) -->
+    <div id="warning-modal" class="modal">
+        <div class="modal-content">
+            <p>El correo ingresado no se encuentra registrado.</p>
+            <button onclick="closeModal('warning-modal')">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- PopUp de Ingreso de Código -->
+    <div id="code-popup" class="popup hidden">
+        <div class="popup-content">
+            <h3>Ingrese el Código de 6 Dígitos</h3>
+            <div class="code-inputs">
+                <input type="text" maxlength="1" class="code-digit" />
+                <input type="text" maxlength="1" class="code-digit" />
+                <input type="text" maxlength="1" class="code-digit" />
+                <input type="text" maxlength="1" class="code-digit" />
+                <input type="text" maxlength="1" class="code-digit" />
+                <input type="text" maxlength="1" class="code-digit" />
+            </div>
+            <p id="countdown-timer">05:00</p>
+            <button onclick="verifyCode()">Verificar Código</button>
+        </div>
+    </div>
+
+    <!-- Modal de Error (Código incorrecto) -->
+    <div id="error-code-modal" class="modal">
+        <div class="modal-content BadCode">
+            <p>El Código ingresado es incorrecto.</p>
+            <button onclick="closeModal('error-code-modal')">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- PopUp para Nueva Contraseña -->
+    <div id="new-pass-popup" class="popup hidden">
+        <div class="popup-content">
+            <h3>ACTUALIZAR CONTRASEÑA</h3>
+            <label for="newPass">Nueva Contraseña</label>
+            <input type="password" id="newPass" placeholder="Nueva Contraseña" />
+            <label for="confirmNewPass">Repetir Nueva Contraseña</label>
+            <input
+            type="password"
+            id="confirmNewPass"
+            placeholder="Repetir Nueva Contraseña"
+            />
+            <button onclick="updatePassword()">Confirmar Cambio</button>
+        </div>
+    </div>
+
+    <!-- Modal de Error (Contraseñas no coinciden) -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content error">
+            <p id="modal-message">Las contraseñas no coinciden.</p>
+            <button class="modal-close" onclick="closeModal('error-modal')">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Error (Tiempo de Ingreso de Codigo Finalizado) -->
+    <div id="error-time-ended-modal" class="modal">
+        <div class="modal-content TimeEnded">
+            <p id="modal-message">Se acabó el tiempo, por favor solicita un nuevo código.</p>
+            <button class="modal-close" onclick="closeModalTimenEnded('error-time-ended-modal')">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Éxito -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content success">
+            <p>Contraseña actualizada exitosamente. Inicia sesión con tu nueva contraseña.</p>
+            <button class="modal-close" onclick="closeModalSuccess('success-modal')">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="script_recovery.js"></script>
+</body>
+</html>
