@@ -1,3 +1,8 @@
+CREATE TABLE Usuario (
+    mail VARCHAR(45) PRIMARY KEY,
+    contraseña VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE Raza (
     idRaza INT IDENTITY(1,1) PRIMARY KEY,
     nombreRaza VARCHAR(45)
@@ -22,8 +27,10 @@ CREATE TABLE Video (
     nroMuestra INT,
     idTipoPrueba INT,
     idDosis INT,
+    mail_usuario VARCHAR(45),
     FOREIGN KEY (idRaton) REFERENCES Raton(idRaton),
-    FOREIGN KEY (idDosis) REFERENCES Dosis(idDosis)
+    FOREIGN KEY (idDosis) REFERENCES Dosis(idDosis),
+    FOREIGN KEY (mail_usuario) REFERENCES Usuario(mail_usuario)
 );
 
 CREATE TABLE TiempoCuriosidad (
@@ -42,9 +49,10 @@ CREATE TABLE Trayectoria (
     mapaTrayectoria VARBINARY(MAX),
     distanciaRecorrida FLOAT,
     descripcion VARCHAR(45),
-    area_central FLOAT,
-    nro_entrada_area INT,
-    nro_salida_area INT,
+    distanciaRecorrida_AC FLOAT,
+    nro_entrada_AC INT,
+    nro_salida_AC INT,
+	tiempo_dentro_AC FLOAT,
     CONSTRAINT FK_Trayectoria_Video
         FOREIGN KEY (idVideo) REFERENCES Video(idVideo)
         ON DELETE CASCADE
