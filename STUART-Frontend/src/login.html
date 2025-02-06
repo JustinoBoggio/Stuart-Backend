@@ -21,8 +21,17 @@
       <button type="submit">Ingresar</button>
     </form>
 
-    <!-- Sección de Olvidó Contraseña -->
-    <p class="forgot-password" onclick="redirectToRecovery()">¿Olvidó su contraseña?</p>
+    <!-- Sección de Olvidó Contraseña
+    <p class="forgot-password" onclick="redirectToRecovery()">¿Olvidó su contraseña?</p> -->
+
+    <!-- Sección de opciones: Olvidó contraseña y Registrarse -->
+    <div class="login-options">
+        <p class="forgot-password" onclick="redirectToRecovery()">¿Olvidó su contraseña?</p>
+        <span class="separator">|</span>
+        <p class="register" onclick="redirectToRegister()">Registrarse</p>
+      </div>
+    </div>
+
   </div>
 
   <!-- Modal de Error -->

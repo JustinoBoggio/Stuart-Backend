@@ -30,3 +30,8 @@ document.getElementById('login-form').addEventListener('submit', function(event)
   function redirectToRecovery() {
     window.location.href = "recovery.html";
   }
+
+  // Redirige a la página de registro
+  function redirectToRegister() {
+    window.location.href = "register.html";
+  }

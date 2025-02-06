@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style_register.css" />
+  <title>STUART - Registro</title>
+</head>
+<body>
+
+  <div class="register-container">
+    <h2 class="title">REGISTRARSE</h2>
+    <!-- Formulario de Registro -->
+    <form id="register-form">
+      <label for="register-email">Correo Electrónico</label>
+      <input type="email" id="register-email" placeholder="Ingrese su correo" required />
+
+      <label for="register-pass">Contraseña</label>
+      <input type="password" id="register-pass" placeholder="Ingrese su contraseña" required />
+
+      <label for="register-pass2">Repetir Contraseña</label>
+      <input type="password" id="register-pass2" placeholder="Repetir su contraseña" required />
+
+      <button type="submit">Registrarse</button>
+    </form>
+  </div>
+
+  <!-- Modal de Error (email existente) -->
+  <div id="email-exists-modal" class="modal">
+    <div class="modal-content error">
+      <p>El correo ingresado ya existe.</p>
+      <button onclick="closeModal('email-exists-modal')">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Modal de Éxito -->
+  <div id="success-modal" class="modal">
+    <div class="modal-content">
+      <p>Registro exitoso. Ahora puede iniciar sesión.</p>
+      <button onclick="goToLogin()">Iniciar Sesión</button>
+    </div>
+  </div>
+
+  <!-- Modal de Error General -->
+  <div id="error-register-modal" class="modal">
+    <div class="modal-content error">
+      <p>Ha ocurrido un error al registrar un nuevo usuario.</p>
+      <button onclick="closeModal('error-register-modal')">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Modal de Error Contraseñas No Coinciden -->
+  <div id="pass-mismatch-modal" class="modal">
+    <div class="modal-content error">
+      <p>Las contraseñas no coinciden.</p>
+      <button onclick="closeModal('pass-mismatch-modal')">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="script_register.js"></script>
+</body>
+</html>
