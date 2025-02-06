@@ -71,21 +71,35 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+    margin-top: 3%;
   }
   
   button:hover {
     background: #2980b9;
   }
   
-  /* ¿Olvidó su contraseña? */
-  .forgot-password {
-    color: #3498db;
-    cursor: pointer;
+  /* Sección de opciones (Olvidó contraseña y Registrarse) */
+.login-options {
     margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
   }
   
-  .forgot-password:hover {
+  .forgot-password, .register {
+    color: #3498db;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  
+  .forgot-password:hover, .register:hover {
     text-decoration: underline;
+  }
+  
+  .separator {
+    color: #ccc;
+    font-weight: bold;
   }
   
   /* Modal */
