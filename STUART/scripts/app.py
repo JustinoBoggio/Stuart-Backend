@@ -6,12 +6,14 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import os
 import time
+import pyodbc
 from threading import Thread
 from process_video_v3 import main  # Importa la función main de tu script de procesamiento
+from db_connection import get_db_connection 
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:8000"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Define la carpeta de subida con una ruta absoluta desde la raíz
@@ -65,6 +67,87 @@ def process_video(video_path):
     except Exception as e:
         print(f"Error al procesar el video: {str(e)}")
         socketio.emit('error', {'message': 'Error al procesar el video'})
+
+@app.route('/api/breeds', methods=['GET'])
+def get_breeds():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute('SELECT idRaza, nombreRaza FROM Raza')
+    breeds = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    breeds_list = [{'idRaza': breed[0], 'nombreRaza': breed[1]} for breed in breeds]
+    return jsonify(breeds_list)
+
+@app.route('/api/doses', methods=['GET'])
+def get_doses():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    cursor.execute('SELECT idDosis, descripcion FROM Dosis')
+    doses = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    doses_list = [{'idDosis': dose[0], 'descripcion': dose[1]} for dose in doses]
+    return jsonify(doses_list)
+
+@app.route('/api/add_breed', methods=['POST'])
+def add_breed():
+    data = request.json
+    nombre_raza = data.get('name')
+
+    if not nombre_raza:
+        return jsonify({'error': 'El nombre es obligatorio'}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    try:
+        # Insertar sin OUTPUT INSERTED, ya que no necesitamos el ID
+        cursor.execute('INSERT INTO Raza (nombreRaza) VALUES (?)', (nombre_raza,))
+        conn.commit()
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+    return jsonify({'message': f'Raza "{nombre_raza}" agregada con éxito.'}), 201
+
+@app.route('/api/add_dose', methods=['POST'])
+def add_dose():
+    data = request.json
+    descripcion = data.get('name')
+
+    if not descripcion:
+        return jsonify({'error': 'El nombre es obligatorio'}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    try:
+        # Insertar sin OUTPUT INSERTED, ya que no necesitamos el ID
+        cursor.execute('INSERT INTO Dosis (descripcion) VALUES (?)', (descripcion,))
+        conn.commit()
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+    return jsonify({'message': f'Dosis "{descripcion}" agregada con éxito.'}), 201
+
 
 @socketio.on('connect')
 def handle_connect():

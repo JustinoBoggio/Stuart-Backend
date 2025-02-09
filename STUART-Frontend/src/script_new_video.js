@@ -24,6 +24,72 @@ socket.on('progress_update', (progressData) => {
   }
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+  loadBreeds();
+  loadDoses();
+});
+
+//Funciones para Dosis y Raza
+function loadBreeds() {
+  fetch('http://127.0.0.1:5000/api/breeds')
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+      })
+      .then(data => {
+          const breedSelect = document.getElementById('breed');
+          breedSelect.innerHTML = ''; // Clear existing options
+
+          // Agrega la opción predeterminada
+          const defaultOption = document.createElement('option');
+          defaultOption.value = ""; // Valor vacío para que no represente una opción válida
+          defaultOption.textContent = "Seleccione una raza";
+          defaultOption.disabled = true; // Desactivar la opción para que no pueda seleccionarse
+          defaultOption.selected = true; // Seleccionar como opción predeterminada
+          breedSelect.appendChild(defaultOption);
+
+          data.forEach(breed => {
+              const option = document.createElement('option');
+              option.value = breed.idRaza;
+              option.textContent = breed.nombreRaza;
+              breedSelect.appendChild(option);
+          });
+      })
+      .catch(error => console.error('Error al cargar razas:', error));
+}
+
+function loadDoses() {
+  fetch('http://127.0.0.1:5000/api/doses')
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+      })
+      .then(data => {
+          const doseSelect = document.getElementById('dose-list');
+          doseSelect.innerHTML = ''; // Clear existing options
+
+          // Agrega la opción predeterminada
+          const defaultOption = document.createElement('option');
+          defaultOption.value = ""; // Valor vacío para que no represente una opción válida
+          defaultOption.textContent = "Seleccione una dosis";
+          defaultOption.disabled = true; // Desactivar la opción para que no pueda seleccionarse
+          defaultOption.selected = true; // Seleccionar como opción predeterminada
+          doseSelect.appendChild(defaultOption);
+
+          data.forEach(dose => {
+              const option = document.createElement('option');
+              option.value = dose.idDosis;
+              option.textContent = dose.descripcion;
+              doseSelect.appendChild(option);
+          });
+      })
+      .catch(error => console.error('Error al cargar dosis:', error));
+}
+
 // Función para alternar los campos adicionales de dosis
 function toggleDoseFields() {
   const doseFields = document.querySelector('.dose-fields');
@@ -104,35 +170,59 @@ function closeErrorModal() {
 }
 
 let currentAction = ""; // Variable para identificar si es raza o dosis
-// Guarda el valor ingresado en el modal
+
+
 function confirmModal() {
   const modalInput = document.getElementById('modal-input');
   const value = modalInput.value.trim();
 
   if (value) {
+      let url = "";
+      const data = { name: value };
+
       if (currentAction === "breed") {
-          const breedSelect = document.getElementById('breed');
-          const newOption = document.createElement('option');
-          newOption.value = value;
-          newOption.textContent = value;
-          breedSelect.appendChild(newOption);
-
-          // Mostrar el modal de Éxito
-          showSuccessModal(`Raza "${value}" agregada con éxito.`);
+          url = 'http://127.0.0.1:5000/api/add_breed';
       } else if (currentAction === "dose") {
-          const doseList = document.getElementById('dose-list');
-          const newOption = document.createElement('option');
-          newOption.value = value;
-          newOption.textContent = value;
-          doseList.appendChild(newOption);
-
-          // Mostrar el modal de Éxito
-          showSuccessModal(`Dosis "${value}" agregada con éxito.`);
+          url = 'http://127.0.0.1:5000/api/add_dose';
       }
 
-      closeModal(); // Cierra el modal de entrada
+      fetch(url, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+      })
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Error al agregar elemento');
+          }
+          return response.json();
+      })
+      .then(data => {
+          console.log(data.message);
+          if (currentAction === "breed") {
+              const breedSelect = document.getElementById('breed');
+              const newOption = document.createElement('option');
+              newOption.value = value;
+              newOption.textContent = value;
+              breedSelect.appendChild(newOption);
+              showSuccessModal(`Raza "${value}" agregada con éxito.`);
+          } else if (currentAction === "dose") {
+              const doseList = document.getElementById('dose-list');
+              const newOption = document.createElement('option');
+              newOption.value = value;
+              newOption.textContent = value;
+              doseList.appendChild(newOption);
+              showSuccessModal(`Dosis "${value}" agregada con éxito.`);
+          }
+          closeModal(); // Cierra el modal de entrada
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          showAlertModal('Hubo un problema al agregar el elemento.');
+      });
   } else {
-      // Mostrar el modal de Alerta
       showAlertModal("Por favor, ingrese un nombre válido.");
   }
 }
