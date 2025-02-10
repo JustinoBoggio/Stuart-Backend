@@ -20,11 +20,10 @@
                 <div class="input-group">
                     <label for="breed">Raza:</label>
                     <div class="field-group">
-                        <select id="breed">
-                            <option value="raza1">Raza 1</option>
-                            <option value="raza2">Raza 2</option>
+                        <select id="breed" name="breed">
+                            <!-- Opciones cargadas dinámicamente -->
                         </select>
-                        <button class="add-button" onclick="openModal('breed')">+</button>
+                        <button type="button" onclick="openModal('breed')">+</button>
                     </div>
                 </div>
             
@@ -52,11 +51,10 @@
                     <div class="input-group">
                         <label for="dose-list">Dosis:</label>
                         <div class="field-group">
-                            <select id="dose-list">
-                                <option value="dosis1">Dosis 1</option>
-                                <option value="dosis2">Dosis 2</option>
+                            <select id="dose-list" name="doseList">
+                                <!-- Opciones cargadas dinámicamente -->
                             </select>
-                            <button class="add-button" onclick="openModal('dose')">+</button>
+                            <button type="button" onclick="openModal('dose')">+</button>
                         </div>
                     </div>
             

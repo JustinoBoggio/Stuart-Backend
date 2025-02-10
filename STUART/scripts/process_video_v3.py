@@ -233,7 +233,14 @@ def post_processing(keypoint_trajectories,
                     zona_botellas, 
                     zona_rastis,
                     zona_central,
-                    class_colors):
+                    class_colors,
+                    id_raton,
+                    id_dosis,
+                    nro_muestra,
+                    id_tipo_prueba,
+                    cantidad,
+                    mail_usuario
+                    ):
     """
     Genera mapas de trayectoria que incluyen la base de la caja, los objetos y sus zonas ampliadas.
 
@@ -398,12 +405,18 @@ def post_processing(keypoint_trajectories,
     area_central_data=keypoint_area_data,
     times_data=tiempo_zonas,
     trajectory_data=trajectory_data,  # Diccionario con los mapas generados en bytes
-    video_name=video_name
-)
+    video_name=video_name,
+    id_raton=id_raton,
+    id_dosis=id_dosis,
+    nro_muestra=nro_muestra,
+    id_tipo_prueba=id_tipo_prueba,
+    cantidad=cantidad,
+    mail_usuario=mail_usuario
+    )
 
 
 
-def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, progress_callback=None):
+def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, id_raton, id_dosis, nro_muestra, id_tipo_prueba, cantidad, mail_usuario, progress_callback=None):
     # Crear un directorio temporal para los mapas de trayectoria
     # Cuando el bloque `with` termina, el directorio temporal y su contenido se eliminan automáticamente.
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -946,36 +959,23 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, prog
         print("Procesamiento completado.")
 
         # Post-procesamiento: Generar mapas de trayectoria y guardar datos
-        post_processing(keypoint_trajectories,
-                        distance_traveled,
-                        tiempo_zonas,
-                        keypoint_area_data,
-                        trajectories_dir,
-                        video_name,
-                        current_objects, 
-                        zona_botellas, 
-                        zona_rastis,
-                        zona_central,
-                        class_colors_matplotlib)
-
-if __name__ == "__main__":
-    # Rutas de ejemplo (ajusta según tu estructura)
-    #video_path = "data/videos/Test_2_H_Recortado.mp4"  # Ruta al video de entrada
-    parser = argparse.ArgumentParser(description="Process a video file with keypoint and YOLO models.")
-    parser.add_argument("video_path", type=str, help="Path to the input video")
-    parser.add_argument("keypoint_config", type=str, help="Path to the keypoint config file")
-    parser.add_argument("keypoint_model_path", type=str, help="Path to the keypoint model file")
-    parser.add_argument("yolo_model_path", type=str, help="Path to the YOLO model file")
-    
-    args = parser.parse_args()
-    
-    # Usa los parámetros obtenidos
-    video_path = args.video_path
-    keypoint_config = args.keypoint_config
-    keypoint_model_path = args.keypoint_model_path
-    yolo_model_path = args.yolo_model_path
-
-    # Ejecutar la función principal con post-procesamiento
-    main(video_path, keypoint_config, keypoint_model_path, yolo_model_path)
+    post_processing(keypoint_trajectories,
+                    distance_traveled,
+                    tiempo_zonas,
+                    keypoint_area_data,
+                    trajectories_dir,
+                    video_name,
+                    current_objects, 
+                    zona_botellas, 
+                    zona_rastis,
+                    zona_central,
+                    class_colors_matplotlib,
+                    id_raton,
+                    id_dosis,
+                    nro_muestra,
+                    id_tipo_prueba,
+                    cantidad,
+                    mail_usuario
+                    )
     
     

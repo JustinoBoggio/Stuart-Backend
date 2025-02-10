@@ -1,6 +1,11 @@
+CREATE TABLE Usuario (
+    mail VARCHAR(100) PRIMARY KEY,
+    contraseña VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE Raza (
     idRaza INT IDENTITY(1,1) PRIMARY KEY,
-    nombreRaza VARCHAR(45)
+    nombreRaza VARCHAR(100)
 );
 
 CREATE TABLE Raton (
@@ -12,8 +17,7 @@ CREATE TABLE Raton (
 
 CREATE TABLE Dosis (
     idDosis INT IDENTITY(1,1) PRIMARY KEY,
-    cantidad VARCHAR(45),
-    sustancia VARCHAR(45)
+    descripcion VARCHAR(150)
 );
 
 CREATE TABLE Video (
@@ -22,8 +26,12 @@ CREATE TABLE Video (
     nroMuestra INT,
     idTipoPrueba INT,
     idDosis INT,
+	cantidad VARCHAR(45) NULL,
+    mail_usuario VARCHAR(100),
+
     FOREIGN KEY (idRaton) REFERENCES Raton(idRaton),
-    FOREIGN KEY (idDosis) REFERENCES Dosis(idDosis)
+    FOREIGN KEY (idDosis) REFERENCES Dosis(idDosis),
+    FOREIGN KEY (mail_usuario) REFERENCES Usuario(mail)
 );
 
 CREATE TABLE TiempoCuriosidad (
@@ -41,10 +49,11 @@ CREATE TABLE Trayectoria (
     idVideo VARCHAR(100),
     mapaTrayectoria VARBINARY(MAX),
     distanciaRecorrida FLOAT,
-    descripcion VARCHAR(45),
-    area_central FLOAT,
-    nro_entrada_area INT,
-    nro_salida_area INT,
+    descripcion VARCHAR(100),
+    distanciaRecorrida_AC FLOAT,
+    nro_entrada_AC INT,
+    nro_salida_AC INT,
+	tiempo_dentro_AC FLOAT,
     CONSTRAINT FK_Trayectoria_Video
         FOREIGN KEY (idVideo) REFERENCES Video(idVideo)
         ON DELETE CASCADE
