@@ -1,5 +1,40 @@
 from db_connection import get_db_connection
 
+def get_or_create_raton_id(sexo, id_raza):
+    conn = get_db_connection()
+    if conn is None:
+        return None
+
+    try:
+        cursor = conn.cursor()
+
+        # Verificar si el ratón ya existe
+        query = """
+        SELECT idRaton FROM Raton WHERE sexo = ? AND idRaza = ?
+        """
+        cursor.execute(query, (sexo, id_raza))
+        row = cursor.fetchone()
+
+        if row:
+            # Si existe, devuelve el idRaton
+            return row[0]
+
+        # Si no existe, inserta un nuevo registro
+        insert_query = """
+        INSERT INTO Raton (sexo, idRaza) OUTPUT INSERTED.idRaton VALUES (?, ?)
+        """
+        cursor.execute(insert_query, (sexo, id_raza))
+        new_id = cursor.fetchone()[0]
+        conn.commit()
+        return new_id
+
+    except Exception as e:
+        print(f"Error al obtener o crear ratón: {e}")
+        return None
+    finally:
+        cursor.close()
+        conn.close()
+
 def insert_video(video_name, id_raton, nro_muestra, id_tipo_prueba, id_dosis, cantidad, mail_usuario):
     """Inserta un video en la tabla Video, reemplazando el existente si ya hay uno con el mismo idVideo."""
     conn = get_db_connection()
@@ -49,6 +84,7 @@ def insert_results_to_db(distances, area_central_data, times_data, trajectory_da
         cantidad (str): Cantidad de dosis.
         mail_usuario (str): Email del usuario.
     """
+
     insert_video(video_name, id_raton, nro_muestra, id_tipo_prueba, id_dosis, cantidad, mail_usuario)
 
     conn = get_db_connection()
@@ -58,6 +94,14 @@ def insert_results_to_db(distances, area_central_data, times_data, trajectory_da
     try:
         cursor = conn.cursor()
 
+        # Verificar si el usuario existe
+        cursor.execute("SELECT COUNT(*) FROM Usuario WHERE mail = ?", (mail_usuario,))
+        user_count = cursor.fetchone()[0]
+
+        if user_count == 0:
+            print(f"Error: El correo '{mail_usuario}' no existe en la tabla Usuario.")
+            return
+        
         # Obtener el idVideo recién insertado
         cursor.execute("SELECT idVideo FROM Video WHERE idVideo = ?", (video_name,))
         video_row = cursor.fetchone()

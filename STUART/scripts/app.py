@@ -9,7 +9,8 @@ import time
 import pyodbc
 from threading import Thread
 from process_video_v3 import main  # Importa la función main de tu script de procesamiento
-from db_connection import get_db_connection 
+from db_connection import get_db_connection
+from save_db import get_or_create_raton_id
 
 
 app = Flask(__name__)
@@ -30,25 +31,39 @@ def upload_video():
     video.save(video_path)
 
     # Obtén los demás datos del formulario
-    breed = request.form['breed']
+    breed_id = request.form['breed']
     gender = request.form['gender']
     dose = request.form['dose']
     doseAmount = request.form['doseAmount']
-    doseList = request.form['doseList']
+    dose_id = request.form['doseList']
     
     print("Datos recibidos:")
-    print(f"Raza: {breed}")
+    print(f"Raza Id: {breed_id}")
     print(f"Sexo: {gender}")
     print(f"Tipo de dosis: {dose}")
     print(f"Dosis Cantidad: {doseAmount}")
-    print(f"Dosis Nombre: {doseList}")
+    print(f"Dosis Id: {dose_id}")
+    mail_usuario = "justino.boggio@cerela.com"
+
+    if dose == 'Dosis Aplicada':
+        id_tipo_prueba=1
+    else: # Sin Dosis
+        id_tipo_prueba=0
+
+    # Obtener o crear idRaton
+    id_raton = get_or_create_raton_id(gender, breed_id)
+    
+    if id_raton is None:
+        return jsonify({"status": "error", "message": "No se pudo obtener o crear idRaton"}), 500
+
+    nro_muestra=100
 
     # Inicia el procesamiento del video en segundo plano
-    socketio.start_background_task(target=process_video, video_path=video_path)
+    socketio.start_background_task(target=process_video, video_path=video_path, id_raton=id_raton, dose=dose_id, nro_muestra=nro_muestra, id_tipo_prueba=id_tipo_prueba, doseAmount=doseAmount, mail_usuario=mail_usuario)
 
     return jsonify({"status": "success", "message": "El video se está procesando"}), 200
 
-def process_video(video_path):
+def process_video(video_path, id_raton, dose, nro_muestra, id_tipo_prueba, doseAmount, mail_usuario):
     try:
         def progress_callback(progress_percentage, remaining_time):
             progress = round(float(progress_percentage), 2)
@@ -61,7 +76,13 @@ def process_video(video_path):
             os.path.join(os.path.dirname(__file__), '..', 'models', 'keypoint_detection', 'config', 'config.yaml'),
             os.path.join(os.path.dirname(__file__), '..', 'models', 'keypoint_detection', 'Bests', 'best_model.pth.tar'),
             os.path.join(os.path.dirname(__file__), '..', 'models', 'yolov11_segmentation', 'yolov11x_segmentation', 'weights', 'best.pt'),
-            progress_callback  # Pasa la función de callback para el progreso
+            id_raton,
+            dose,
+            nro_muestra,
+            id_tipo_prueba,
+            doseAmount,
+            mail_usuario,
+            progress_callback
         )
         print("Análisis completado")
     except Exception as e:
