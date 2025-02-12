@@ -387,6 +387,7 @@ function goBack() {
 let processingInterval;
 let estimatedTotalTime = 10; // Tiempo estimado inicial en segundos
 let startTime; // Tiempo de inicio del procesamiento
+let lastProcessedVideo = null;
 
 function startProcessing() {
   localStorage.setItem('processingStarted', 'true');
@@ -401,6 +402,8 @@ function startProcessing() {
   progressModal.classList.remove('hidden');
 
   const videoFile = fileInput.files[0];
+  lastProcessedVideo = videoFile.name.replace(/\.[^/.]+$/, ""); 
+  
   const breed = document.getElementById('breed').value;
   const gender = document.getElementById('gender').value;
   const dose = document.getElementById('dose').value;
@@ -477,7 +480,13 @@ function updateEstimatedTime(newEstimatedTime) {
 
 // Redirige a la página de resultados después de procesar
 function redirectToResults() {
-  window.location.href = 'results.html';
+  if (!lastProcessedVideo) {
+      console.error("Error: No hay un video procesado.");
+      showErrorModal("No se ha encontrado un video procesado. Asegúrate de procesar un video primero.");
+      return;
+  }
+
+  window.location.href = `results.html?video=${encodeURIComponent(lastProcessedVideo)}`;
 }
 
 // Recarga la página para subir otro video

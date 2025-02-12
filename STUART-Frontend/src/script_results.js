@@ -1,3 +1,10 @@
+// Obtener el nombre del video desde la URL
+const urlParams = new URLSearchParams(window.location.search);
+const videoName = urlParams.get('video');
+
+// Asignar el nombre del video en la interfaz
+document.getElementById("video-name").textContent = videoName;
+
 // Lista de partes del ratón
 const bodyParts = [
   "Nariz",
@@ -51,40 +58,78 @@ function prevItem() {
 }
 
 // Actualiza la tabla y los campos según la parte seleccionada
-function updateData(part) {
-  // Actualiza la imagen y el título
-  const imageContainer = document.querySelector(".image-container img");
-  const imageTitle = document.querySelector(".image-container h2");
-  imageContainer.src = `images/Trayectoria_${part.toLowerCase()}_con_distancia.png`;
-  imageTitle.textContent = `Mapa de trayectoria ${part}`;
+async function updateData(bodyPart) {
+  try {
+      const response = await fetch(`http://127.0.0.1:5000/get_results/${encodeURIComponent(videoName)}/${encodeURIComponent(bodyPart)}`);
+      const data = await response.json();
 
-  // Actualiza la tabla (simulación de datos dinámicos)
-  const tableBody = document.querySelector(".table-container tbody");
-  tableBody.innerHTML = `
-    <tr>
-      <td>video.mp4</td>
-      <td>${part}</td>
-      <td>Objeto A</td>
-      <td>15.2</td>
-    </tr>
-    <tr>
-      <td>video.mp4</td>
-      <td>${part}</td>
-      <td>Objeto B</td>
-      <td>10.5</td>
-    </tr>
-  `;
+      console.log("Datos recibidos:", data); // Debug: Ver JSON devuelto por el backend
 
-  // Actualiza el resumen
-  const summary = document.querySelector(".table-summary");
-  summary.textContent = "Tiempo total: 25.7 segundos";
+      if (!data || data.error) {
+          console.error("Error en la respuesta del backend:", data ? data.error : "Respuesta vacía");
+          return;
+      }
 
-  // Actualiza los campos
-  document.getElementById("total-distance").value = "12.5";
-  document.getElementById("central-distance").value = "4.3";
-  document.getElementById("central-time").value = "8.7";
-  document.getElementById("central-entries").value = "3";
-  document.getElementById("central-exits").value = "3";
+      // Actualizar la tabla de tiempos de curiosidad
+      const tableBody = document.querySelector(".table-container tbody");
+      tableBody.innerHTML = "";
+
+      if (data.times && data.times.length > 0) {
+          data.times.forEach(entry => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                  <td>${videoName}</td>
+                  <td>${bodyPart}</td>
+                  <td>${entry.object}</td>
+                  <td>${entry.time.toFixed(2)} segundos</td>
+              `;
+              tableBody.appendChild(row);
+          });
+
+          const totalTime = data.times.reduce((sum, entry) => sum + entry.time, 0).toFixed(2);
+          document.querySelector(".table-summary").textContent = `Tiempo total: ${totalTime} segundos`;
+      } else {
+          document.querySelector(".table-summary").textContent = `Tiempo total: 0.00 segundos`;
+      }
+
+      document.getElementById("total-distance").value = data.distance ? data.distance.toFixed(2) : "0.00";
+      document.getElementById("central-distance").value = data.central_distance ? data.central_distance.toFixed(2) : "0.00";
+      document.getElementById("central-time").value = data.central_time ? data.central_time.toFixed(2) : "0.00";
+      document.getElementById("central-entries").value = data.central_entries || "0";
+      document.getElementById("central-exits").value = data.central_exits || "0";
+
+      // Obtener imagen del mapa de trayectoria
+      await fetchTrajectoryImage(bodyPart);
+
+  } catch (error) {
+      console.error("Error al obtener los datos:", error);
+  }
+}
+
+// Función para obtener la imagen de trayectoria desde el backend
+async function fetchTrajectoryImage(part) {
+  try {
+      // Asegurar que la imagen se obtiene del backend y no de una ruta local
+      const imgResponse = await fetch(`http://127.0.0.1:5000/get_trayectoria_image/${encodeURIComponent(videoName)}/${encodeURIComponent(part)}`);
+
+      if (!imgResponse.ok) {
+          throw new Error(`Error HTTP: ${imgResponse.status}`);
+      }
+
+      const imgBlob = await imgResponse.blob();
+      const imgUrl = URL.createObjectURL(imgBlob);
+
+      const mapImageElement = document.getElementById("map-image");
+
+      if (!mapImageElement) {
+          console.error("Error: Elemento con id 'map-image' no encontrado en el HTML.");
+          return;
+      }
+
+      mapImageElement.src = imgUrl;
+  } catch (error) {
+      console.error("Error al obtener la imagen de trayectoria:", error);
+  }
 }
 
 // Inicialización
@@ -103,5 +148,7 @@ function initialize() {
 document.querySelector(".arrow.left").addEventListener("click", prevItem);
 document.querySelector(".arrow.right").addEventListener("click", nextItem);
 
-// Llama a la función de inicialización
-initialize();
+// Llama a la función de inicialización al cargar completamente el DOM
+document.addEventListener('DOMContentLoaded', (event) => {
+  initialize();
+});
