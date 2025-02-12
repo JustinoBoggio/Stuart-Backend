@@ -11,6 +11,7 @@ from threading import Thread
 from process_video_v3 import main, cancel_analysis  # Importa la función main de tu script de procesamiento
 from db_connection import get_db_connection
 from save_db import get_or_create_raton_id, get_or_create_dosis_id
+import bcrypt  # Asegúrate de instalar bcrypt para manejar la verificación de contraseñas
 
 
 app = Flask(__name__)
@@ -170,6 +171,75 @@ def add_dose():
         conn.close()
 
     return jsonify({'message': f'Dosis "{descripcion}" agregada con éxito.'}), 201
+
+@app.route('/api/register', methods=['POST'])
+def register_user():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email y contraseña son requeridos'}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    try:
+        # Verifica si el correo ya está registrado
+        cursor.execute('SELECT COUNT(*) FROM Usuario WHERE mail = ?', (email,))
+        if cursor.fetchone()[0] > 0:
+            return jsonify({'error': 'El correo ya está registrado'}), 400
+
+        # Encripta la contraseña antes de almacenarla
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        # Inserta el nuevo usuario
+        cursor.execute('INSERT INTO Usuario (mail, contraseña) VALUES (?, ?)', (email, hashed_password.decode('utf-8')))
+        conn.commit()
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+    return jsonify({'message': 'Usuario registrado con éxito'}), 201
+
+@app.route('/api/login', methods=['POST'])
+def login_user():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email y contraseña son requeridos'}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    try:
+        # Busca el usuario por correo
+        cursor.execute('SELECT contraseña FROM Usuario WHERE mail = ?', (email,))
+        user = cursor.fetchone()
+
+        if user is None:
+            return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
+
+        # Verifica la contraseña
+        stored_password = user[0]
+        if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
+            return jsonify({'message': 'Inicio de sesión exitoso'}), 200
+        else:
+            return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 
 @app.route('/cancel_analysis', methods=['POST'])
 def cancel_analysis_route():

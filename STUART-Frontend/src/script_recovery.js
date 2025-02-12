@@ -117,7 +117,7 @@ function closeModalSuccess(modalId) {
     document.getElementById("new-pass-popup").style.display = "none";
 
     // Redirige a la página de LogIn
-    window.location.href = "login.html";
+    window.location.href = "index.html";
 }
 
 // Cierra modal de Tiempo Finalizado
