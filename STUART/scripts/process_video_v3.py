@@ -27,6 +27,22 @@ sys.path.insert(0, parent_dir)
 from models.keypoint_detection.infer_keypoints import load_keypoint_model, get_keypoints, draw_keypoints
 from models.yolov11_segmentation.infer_yolo import load_yolo_model, get_yolo_detections, draw_yolo_detections
 
+analysis_should_continue = True
+
+def closeCv2Window(cap, out):
+    cap.release()
+    if out:
+        out.release()
+    cv2.destroyAllWindows()
+
+def should_continue_analysis():
+    global analysis_should_continue
+    return analysis_should_continue
+
+def cancel_analysis():
+    global analysis_should_continue
+    analysis_should_continue = False
+
 def shrink_polygon_towards_centroid(points, delta):
     """
     Reduce un polígono hacia su centroide moviendo cada punto una distancia delta en píxeles.
@@ -236,8 +252,6 @@ def post_processing(keypoint_trajectories,
                     class_colors,
                     id_raton,
                     id_dosis,
-                    nro_muestra,
-                    id_tipo_prueba,
                     cantidad,
                     mail_usuario
                     ):
@@ -400,25 +414,31 @@ def post_processing(keypoint_trajectories,
 
     print("Contenido de times_data:", tiempo_zonas)
 
-    insert_results_to_db(
-    distances=distance_traveled,
-    area_central_data=keypoint_area_data,
-    times_data=tiempo_zonas,
-    trajectory_data=trajectory_data,  # Diccionario con los mapas generados en bytes
-    video_name=video_name,
-    id_raton=id_raton,
-    id_dosis=id_dosis,
-    nro_muestra=nro_muestra,
-    id_tipo_prueba=id_tipo_prueba,
-    cantidad=cantidad,
-    mail_usuario=mail_usuario
-    )
+    if should_continue_analysis():
+        insert_results_to_db(
+        distances=distance_traveled,
+        area_central_data=keypoint_area_data,
+        times_data=tiempo_zonas,
+        trajectory_data=trajectory_data,  # Diccionario con los mapas generados en bytes
+        video_name=video_name,
+        id_raton=id_raton,
+        id_dosis=id_dosis,
+        cantidad=cantidad,
+        mail_usuario=mail_usuario
+        )
 
 
 
-def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, id_raton, id_dosis, nro_muestra, id_tipo_prueba, cantidad, mail_usuario, progress_callback=None):
+def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, id_raton, id_dosis, cantidad, mail_usuario, progress_callback=None):
     # Crear un directorio temporal para los mapas de trayectoria
     # Cuando el bloque `with` termina, el directorio temporal y su contenido se eliminan automáticamente.
+    global analysis_should_continue
+    analysis_should_continue = True
+
+    if not should_continue_analysis():
+        print("Análisis cancelado.")
+        return
+
     with tempfile.TemporaryDirectory() as temp_dir:
         video_name = os.path.splitext(os.path.basename(video_path))[0]
         trajectories_dir = os.path.join(temp_dir, f"processed_{video_name}")
@@ -490,7 +510,10 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, id_r
             print(f"Video de salida guardado en: {output_path}")
         else:
             out = None
-
+        if not should_continue_analysis():
+            print("Análisis cancelado.")
+            closeCv2Window(cap, out)
+            return
         start_time = time.time()  # Marca el inicio del procesamiento
         # Iniciar la barra de progreso
         with tqdm(total=total_frames, desc="Procesando Video", unit="frame") as pbar:
@@ -500,6 +523,11 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, id_r
                 if not ret:
                     break
 
+                if not should_continue_analysis():
+                    print("Análisis cancelado.")
+                    closeCv2Window(cap, out)
+                    return
+                
                 frame_count += 1
                 print(f"\nProcesando frame {frame_count}/{total_frames}")
 
@@ -921,6 +949,10 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, id_r
                 # Actualizar la barra de progreso
                 pbar.update(1)
 
+                if not should_continue_analysis():
+                    print("Análisis cancelado.")
+                    closeCv2Window(cap, out)
+                    return
 
                 # Obtén el progreso en porcentaje
                 progress_percentage = (pbar.n / total_frames) * 100
@@ -958,7 +990,13 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, id_r
         cv2.destroyAllWindows()
         print("Procesamiento completado.")
 
-        # Post-procesamiento: Generar mapas de trayectoria y guardar datos
+
+    if not should_continue_analysis():
+        print("Análisis cancelado.")
+        closeCv2Window(cap, out)
+        return
+
+    # Post-procesamiento: Generar mapas de trayectoria y guardar datos
     post_processing(keypoint_trajectories,
                     distance_traveled,
                     tiempo_zonas,
@@ -972,8 +1010,6 @@ def main(video_path, keypoint_config, keypoint_model_path, yolo_model_path, id_r
                     class_colors_matplotlib,
                     id_raton,
                     id_dosis,
-                    nro_muestra,
-                    id_tipo_prueba,
                     cantidad,
                     mail_usuario
                     )

@@ -23,8 +23,6 @@ CREATE TABLE Dosis (
 CREATE TABLE Video (
     idVideo VARCHAR(100) PRIMARY KEY,
     idRaton INT,
-    nroMuestra INT,
-    idTipoPrueba INT,
     idDosis INT,
 	cantidad VARCHAR(45) NULL,
     mail_usuario VARCHAR(100),

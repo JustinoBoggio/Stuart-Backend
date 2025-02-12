@@ -35,7 +35,38 @@ def get_or_create_raton_id(sexo, id_raza):
         cursor.close()
         conn.close()
 
-def insert_video(video_name, id_raton, nro_muestra, id_tipo_prueba, id_dosis, cantidad, mail_usuario):
+def get_or_create_dosis_id(dose_description):
+    conn = get_db_connection()
+    if conn is None:
+        return None
+
+    try:
+        cursor = conn.cursor()
+        
+        # Buscar si la dosis ya existe
+        cursor.execute("SELECT idDosis FROM Dosis WHERE descripcion = ?", (dose_description,))
+        row = cursor.fetchone()
+        
+        if row:
+            return row[0]
+        
+        # Si no existe, crear una nueva dosis
+        cursor.execute("INSERT INTO Dosis (descripcion) VALUES (?)", (dose_description,))
+        conn.commit()
+        
+        # Obtener el idDosis recién creado
+        cursor.execute("SELECT @@IDENTITY")
+        new_id = cursor.fetchone()[0]
+        return new_id
+
+    except Exception as e:
+        print(f"Error al obtener o crear dosis: {e}")
+        return None
+    finally:
+        cursor.close()
+        conn.close()
+
+def insert_video(video_name, id_raton, id_dosis, cantidad, mail_usuario):
     """Inserta un video en la tabla Video, reemplazando el existente si ya hay uno con el mismo idVideo."""
     conn = get_db_connection()
     if conn is None:
@@ -56,9 +87,9 @@ def insert_video(video_name, id_raton, nro_muestra, id_tipo_prueba, id_dosis, ca
 
         # Insertar el nuevo registro con los parámetros dinámicos
         cursor.execute("""
-            INSERT INTO Video (idVideo, idRaton, nroMuestra, idTipoPrueba, idDosis, cantidad, mail_usuario)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (video_name, id_raton, nro_muestra, id_tipo_prueba, id_dosis, cantidad, mail_usuario))
+            INSERT INTO Video (idVideo, idRaton, idDosis, cantidad, mail_usuario)
+            VALUES (?, ?, ?, ?, ?)
+        """, (video_name, id_raton, id_dosis, cantidad, mail_usuario))
         conn.commit()
         print(f"Video '{video_name}' insertado correctamente.")
     except Exception as e:
@@ -67,7 +98,7 @@ def insert_video(video_name, id_raton, nro_muestra, id_tipo_prueba, id_dosis, ca
         cursor.close()
         conn.close()
 
-def insert_results_to_db(distances, area_central_data, times_data, trajectory_data, video_name, id_raton, id_dosis, nro_muestra, id_tipo_prueba, cantidad, mail_usuario):
+def insert_results_to_db(distances, area_central_data, times_data, trajectory_data, video_name, id_raton, id_dosis, cantidad, mail_usuario):
     """
     Inserta los resultados del procesamiento en las tablas Trayectoria y TiempoCuriosidad.
 
@@ -85,7 +116,7 @@ def insert_results_to_db(distances, area_central_data, times_data, trajectory_da
         mail_usuario (str): Email del usuario.
     """
 
-    insert_video(video_name, id_raton, nro_muestra, id_tipo_prueba, id_dosis, cantidad, mail_usuario)
+    insert_video(video_name, id_raton, id_dosis, cantidad, mail_usuario)
 
     conn = get_db_connection()
     if conn is None:

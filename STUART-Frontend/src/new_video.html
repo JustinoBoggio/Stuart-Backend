@@ -104,12 +104,13 @@
         <div class="modal-content">
             <div class="modal-header progressing">Procesando Video</div>
             <p><strong>Progreso:</strong> <span id="progress-percentage-text">0%</span> completado</p>
-            <p><strong>Tiempo estimado restante:</strong> <span id="estimated-time">00:00:00</span></p>       
+            <p><strong>Tiempo estimado restante:</strong> <span id="estimated-time">00:00:00</span></p>    
             <div class="progress-bar-container">
                 <div id="progress-bar" class="progress-bar">
                     <span id="progress-percentage-bar" class="progress-percentage">0%</span>
                 </div>
             </div>
+            <button id="cancel-button" class="modal-cancel" onclick="cancelProcessing()">Cancelar</button>   
         </div>
     </div>
 
