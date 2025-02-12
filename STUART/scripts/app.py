@@ -1,7 +1,7 @@
 import eventlet
 eventlet.monkey_patch()  # Esto parchea las bibliotecas estándar para que sean compatibles con eventlet
 
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, session
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 import os
@@ -11,23 +11,50 @@ from threading import Thread
 from process_video_v3 import main, cancel_analysis  # Importa la función main de tu script de procesamiento
 from db_connection import get_db_connection
 from save_db import get_or_create_raton_id, get_or_create_dosis_id
+import bcrypt  # Asegúrate de instalar bcrypt para manejar la verificación de contraseñas
 from io import BytesIO
 
 
 app = Flask(__name__)
-#CORS(app)
-CORS(app, resources={r"/*": {"origins": "*"}})
+#secret_key = os.urandom(24)
+app.secret_key = 'stuart2025' # La clave secreta se usa para firmar las cookies de sesión, de tal manera que si un atacante intenta modificar la cookie, Flask podrá detectarlo y rechazar la sesión.
+app.config.update(
+    #SESSION_COOKIE_SAMESITE='None',  # Permitir cookies en solicitudes de origen cruzado
+    SESSION_COOKIE_SECURE=False,     # No requiere HTTPS en desarrollo; asegúrate de cambiar esto en producción
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax'     # Protege las cookies de ser accedidas por JavaScript
+)
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
-#CORS(app, resources={r"/*": {"origins": "http://localhost:8000"}})
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", manage_session = True)
 
 # Define la carpeta de subida con una ruta absoluta desde la raíz
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'data', 'videos')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+@app.route('/session_test', methods=['GET', 'POST'])
+def session_test():
+    if request.method == 'POST':
+        session['test_key'] = 'test_value'
+        return jsonify({'message': 'Valor almacenado en sesión'}), 200
+    else:
+        value = session.get('test_key', 'No hay valor en sesión')
+        return jsonify({'session_value': value}), 200
+    
+@app.route('/check_session_email', methods=['GET'])
+def check_session_email():
+    # Recuperar el valor del correo electrónico de la sesión
+    print(f"Contenido de la sesión: {dict(session)}")
+    user_email = session.get('user_email', None)
+    if user_email:
+        return jsonify({'user_email': user_email}), 200
+    else:
+        return jsonify({'error': 'Correo electrónico no encontrado en sesión'}), 404
+
 @app.route('/upload_video', methods=['POST'])
 def upload_video():
     print("Ruta '/upload_video' llamada")
+    print(f"Contenido de la sesión: {dict(session)}")
     
     # Obtén el archivo de video
     video = request.files['videoFile']
@@ -47,7 +74,8 @@ def upload_video():
     print(f"Tipo de dosis: {dose}")
     print(f"Dosis Cantidad: {doseAmount}")
     print(f"Dosis Id: {dose_id}")
-    mail_usuario = "justino.boggio@cerela.com"
+    mail_usuario = session.get('user_email')
+    print(f"Mail Usuario: {mail_usuario}")
 
     # Obtener o crear idRaton
     id_raton = get_or_create_raton_id(gender, breed_id)
@@ -64,9 +92,6 @@ def upload_video():
         return jsonify({"status": "error", "message": "No se pudo obtener o crear idDosis"}), 500
 
     # Inicia el procesamiento del video en segundo plano
-    print("Antes de procesar")
-    print(dose_id)
-    print(doseAmount)
     socketio.start_background_task(target=process_video, video_path=video_path, id_raton=id_raton, dose=dose_id, doseAmount=doseAmount, mail_usuario=mail_usuario)
 
     return jsonify({"status": "success", "message": "El video se está procesando"}), 200
@@ -174,6 +199,77 @@ def add_dose():
         conn.close()
 
     return jsonify({'message': f'Dosis "{descripcion}" agregada con éxito.'}), 201
+
+@app.route('/api/register', methods=['POST'])
+def register_user():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email y contraseña son requeridos'}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    try:
+        # Verifica si el correo ya está registrado
+        cursor.execute('SELECT COUNT(*) FROM Usuario WHERE mail = ?', (email,))
+        if cursor.fetchone()[0] > 0:
+            return jsonify({'error': 'El correo ya está registrado'}), 400
+
+        # Encripta la contraseña antes de almacenarla
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        # Inserta el nuevo usuario
+        cursor.execute('INSERT INTO Usuario (mail, contraseña) VALUES (?, ?)', (email, hashed_password.decode('utf-8')))
+        conn.commit()
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+    return jsonify({'message': 'Usuario registrado con éxito'}), 201
+
+@app.route('/api/login', methods=['POST'])
+def login_user():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email y contraseña son requeridos'}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    try:
+        # Busca el usuario por correo
+        cursor.execute('SELECT contraseña FROM Usuario WHERE mail = ?', (email,))
+        user = cursor.fetchone()
+
+        if user is None:
+            return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
+
+        # Verifica la contraseña
+        stored_password = user[0]
+        if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
+            session['user_email'] = email
+            print(f"Email almacenado en sesión: {session['user_email']}")
+            return jsonify({'message': 'Inicio de sesión exitoso'}), 200
+        else:
+            return jsonify({'error': 'Usuario o contraseña incorrectos'}), 401
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 
 @app.route('/cancel_analysis', methods=['POST'])
 def cancel_analysis_route():

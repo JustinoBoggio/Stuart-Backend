@@ -113,3 +113,16 @@ button:hover {
 .modal-content.error button:hover{
     background-color: #c0392b;
 }
+
+.back-button {
+  background-color: red;      /* Fondo rojo */
+  color: white;               /* Texto blanco */
+  border: none;               /* Sin bordes */
+  padding: 10px 20px;         /* Espaciado interno */
+  cursor: pointer;            /* Cambia el cursor a una mano al pasar sobre el botón */
+  transition: background-color 0.3s ease; /* Transición suave al cambiar el color */
+}
+
+.back-button:hover {
+  background-color: darkred;  /* Color más oscuro al pasar el ratón por encima */
+}

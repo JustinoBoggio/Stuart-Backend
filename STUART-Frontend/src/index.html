@@ -1,23 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>STUART</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style_login.css" />
+  <title>STUART - Iniciar Sesión</title>
 </head>
 <body>
-    <div id="header-container"></div>
-    <h1 class="title">BIENVENIDO A STUART</h1>
-    <img src="images/background-2.png" alt="Imagen Cientifica" class="middle-image">
-    <main>
-        <div class="buttons-container">
-            <button type="button" onclick="redirectToAnotherPage('new_video.html')">Nuevo Video</button>
-            <button type="button" onclick="redirectToAnotherPage('library.html')">Explorar Videos</button>
-        </div>
-        <!-- Aquí puedes agregar el contenido principal de la página -->
-    </main>
+
+  <div class="login-container">
+    <h2 class="title">INICIAR SESIÓN</h2>
+    <!-- Formulario de LogIn -->
+    <form id="login-form">
+      <label class="DatosLogIn" for="email">Correo Electrónico</label>
+      <input type="email" id="email" placeholder="Ingrese su correo" required />
+
+      <label class="DatosLogIn" for="password">Contraseña</label>
+      <input type="password" id="password" placeholder="Ingrese su contraseña" required />
+
+      <button type="submit">Ingresar</button>
+    </form>
+
+    <!-- Sección de Olvidó Contraseña
+    <p class="forgot-password" onclick="redirectToRecovery()">¿Olvidó su contraseña?</p> -->
+
+    <!-- Sección de opciones: Olvidó contraseña y Registrarse -->
+    <div class="login-options">
+        <p class="forgot-password" onclick="redirectToRecovery()">¿Olvidó su contraseña?</p>
+        <span class="separator">|</span>
+        <p class="register" onclick="redirectToRegister()">Registrarse</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de Error -->
+  <!-- <div id="error-modal" class="modal">
+    <div class="modal-content">
+      <p>El mail ingresado o la contraseña no son correctos.</p>
+      <button onclick="closeModal('error-modal')">Cerrar</button>
+    </div>
+  </div> -->
+  <div id="error-modal" class="modal">
+    <div class="modal-content error">
+      <p></p> <!-- El texto del error se actualizará dinámicamente -->
+      <button onclick="closeModal('error-modal')">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="script_login.js"></script>
 </body>
 </html>
-
-<script src="script.js"></script>

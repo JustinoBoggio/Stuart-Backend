@@ -7,15 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
           // Asignar eventos para las imágenes del header
           document.querySelectorAll('.logo-container img').forEach(img => {
               img.addEventListener('click', () => {
-                  top.location.href = 'index.html';
+                  top.location.href = 'main.html';
               });
           });
       });
 });
 
 function redirectToIndex() {
-  if (window.location.pathname !== '/index.html') {
-      window.location.href = 'index.html';
+  if (window.location.pathname !== '/main.html') {
+      window.location.href = 'main.html';
   }
 }
 

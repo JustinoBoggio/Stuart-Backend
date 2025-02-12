@@ -1,10 +1,4 @@
-// script_register.js
-
-// Simulamos un listado de correos ya registrados
-let registeredUsers = ["usuario@ejemplo.com", "otro@ejemplo.com"];
-
-// Manejamos el submit del formulario de registro
-document.getElementById('register-form').addEventListener('submit', function(event) {
+document.getElementById('register-form').addEventListener('submit', async function(event) {
   event.preventDefault();
 
   const email = document.getElementById('register-email').value;
@@ -17,33 +11,43 @@ document.getElementById('register-form').addEventListener('submit', function(eve
     return;
   }
 
-  // Verifica si el correo ya está registrado
-  if (registeredUsers.includes(email)) {
-    document.getElementById('email-exists-modal').style.display = 'flex';
-    return;
-  }
-
-  // Simulación de registro
   try {
-    // (En un caso real, enviarías estos datos al servidor via fetch/AJAX)
-    
-    // Suponemos que se registra correctamente
-    registeredUsers.push(email);
+    const response = await fetch('http://localhost:5000/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password: pass })
+    });
 
-    // Muestra modal de éxito
-    document.getElementById('success-modal').style.display = 'flex';
+    const result = await response.json();
+
+    if (response.ok) {
+      // Registro exitoso
+      document.getElementById('success-modal').style.display = 'flex';
+    } else {
+      // Maneja errores específicos
+      if (result.error === 'El correo ya está registrado') {
+        document.getElementById('error-register-modal').querySelector('p').textContent = 'El correo ya está registrado.';
+      } else {
+        document.getElementById('error-register-modal').querySelector('p').textContent = 'Ha ocurrido un error al registrar un nuevo usuario.';
+      }
+      document.getElementById('error-register-modal').style.display = 'flex';
+    }
   } catch (error) {
     // Si algo sale mal
+    document.getElementById('error-register-modal').querySelector('p').textContent = 'Error al registrar. Inténtalo de nuevo.';
     document.getElementById('error-register-modal').style.display = 'flex';
   }
 });
+
 
 // Cierra un modal específico
 function closeModal(modalId) {
   document.getElementById(modalId).style.display = 'none';
 }
 
-// Redirige al login al hacer click en el botón de “Iniciar Sesión”
+// // Redirige al login al hacer click en el botón de “Iniciar Sesión”
 function goToLogin() {
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
