@@ -8,9 +8,9 @@ import os
 import time
 import pyodbc
 from threading import Thread
-from process_video_v3 import main  # Importa la función main de tu script de procesamiento
+from process_video_v3 import main, cancel_analysis  # Importa la función main de tu script de procesamiento
 from db_connection import get_db_connection
-from save_db import get_or_create_raton_id
+from save_db import get_or_create_raton_id, get_or_create_dosis_id
 from io import BytesIO
 
 
@@ -49,25 +49,29 @@ def upload_video():
     print(f"Dosis Id: {dose_id}")
     mail_usuario = "justino.boggio@cerela.com"
 
-    if dose == 'Dosis Aplicada':
-        id_tipo_prueba=1
-    else: # Sin Dosis
-        id_tipo_prueba=0
-
     # Obtener o crear idRaton
     id_raton = get_or_create_raton_id(gender, breed_id)
     
     if id_raton is None:
         return jsonify({"status": "error", "message": "No se pudo obtener o crear idRaton"}), 500
 
-    nro_muestra=100
+    # Verifica si dose_id está vacío y asigna "Sin Dosis" si es necesario
+    if not dose_id:
+        doseAmount = None
+        dose_id = str(get_or_create_dosis_id("Sin Dosis"))
+    
+    if not dose_id:
+        return jsonify({"status": "error", "message": "No se pudo obtener o crear idDosis"}), 500
 
     # Inicia el procesamiento del video en segundo plano
-    socketio.start_background_task(target=process_video, video_path=video_path, id_raton=id_raton, dose=dose_id, nro_muestra=nro_muestra, id_tipo_prueba=id_tipo_prueba, doseAmount=doseAmount, mail_usuario=mail_usuario)
+    print("Antes de procesar")
+    print(dose_id)
+    print(doseAmount)
+    socketio.start_background_task(target=process_video, video_path=video_path, id_raton=id_raton, dose=dose_id, doseAmount=doseAmount, mail_usuario=mail_usuario)
 
     return jsonify({"status": "success", "message": "El video se está procesando"}), 200
 
-def process_video(video_path, id_raton, dose, nro_muestra, id_tipo_prueba, doseAmount, mail_usuario):
+def process_video(video_path, id_raton, dose, doseAmount, mail_usuario):
     try:
         def progress_callback(progress_percentage, remaining_time):
             progress = round(float(progress_percentage), 2)
@@ -82,8 +86,6 @@ def process_video(video_path, id_raton, dose, nro_muestra, id_tipo_prueba, doseA
             os.path.join(os.path.dirname(__file__), '..', 'models', 'yolov11_segmentation', 'yolov11x_segmentation', 'weights', 'best.pt'),
             id_raton,
             dose,
-            nro_muestra,
-            id_tipo_prueba,
             doseAmount,
             mail_usuario,
             progress_callback
@@ -172,6 +174,11 @@ def add_dose():
         conn.close()
 
     return jsonify({'message': f'Dosis "{descripcion}" agregada con éxito.'}), 201
+
+@app.route('/cancel_analysis', methods=['POST'])
+def cancel_analysis_route():
+    cancel_analysis()
+    return jsonify({'status': 'analysis cancelled'}), 200
 
 
 @app.route('/get_videos', methods=['GET'])

@@ -29,6 +29,26 @@ document.addEventListener('DOMContentLoaded', function() {
   loadDoses();
 });
 
+window.addEventListener('beforeunload', function (e) {
+  // Solo marca la cancelación si el procesamiento había comenzado
+  if (localStorage.getItem('processingStarted') === 'true') {
+    localStorage.setItem('analysisCancelled', 'true');
+    fetch('http://127.0.0.1:5000/cancel_analysis', { method: 'POST' });
+  }
+});
+
+// Al cargar la página nuevamente
+window.addEventListener('load', function () {
+  // Verifica si el procesamiento había comenzado y se canceló
+  if (localStorage.getItem('processingStarted') === 'true' && localStorage.getItem('analysisCancelled') === 'true') {
+    showAlertModal('El análisis anterior fue cancelado.');
+
+    // Limpia los indicadores
+    localStorage.removeItem('analysisCancelled');
+    localStorage.removeItem('processingStarted');
+  }
+});
+
 //Funciones para Dosis y Raza
 function loadBreeds() {
   fetch('http://127.0.0.1:5000/api/breeds')
@@ -242,6 +262,63 @@ function closeConfirmationModal() {
   confirmationModal.classList.add('hidden'); // Oculta el modal
 }
 
+function cancelProcessing() {
+  const confirmCancel = confirm("¿Estás seguro de cancelar el procesamiento?");
+  if (confirmCancel) {
+    // Detener cualquier temporizador o intervalo
+    if (typeof processingInterval !== 'undefined') {
+      clearInterval(processingInterval);
+      console.log('Intervalo detenido');
+    }
+
+    // Ocultar el modal de progreso
+    const progressModal = document.getElementById('progress-modal');
+    if (progressModal) {
+      progressModal.classList.add('hidden');
+    }
+
+    // Reiniciar los valores de progreso en la interfaz de usuario
+    const progressBar = document.getElementById('progress-bar');
+    const progressPercentageText = document.getElementById('progress-percentage-text');
+    const progressPercentageBar = document.getElementById('progress-percentage-bar');
+    const estimatedTime = document.getElementById('estimated-time');
+
+    if (progressBar) {
+      progressBar.style.width = '0%';
+      // Forzar re-renderizado
+      progressBar.offsetHeight; // Leer una propiedad del DOM
+    }
+    if (progressPercentageText) {
+      progressPercentageText.innerText = '0%';
+    }
+    if (progressPercentageBar) {
+      progressPercentageBar.innerText = '0%';
+    }
+    if (estimatedTime) {
+      estimatedTime.innerText = '00:00:00';
+    }
+    localStorage.removeItem('analysisCancelled');
+    localStorage.removeItem('processingStarted');
+
+    // Enviar solicitud al backend para cancelar el análisis
+    fetch('http://127.0.0.1:5000/cancel_analysis', { method: 'POST' })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error al cancelar el análisis');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data.status);
+        showAlertModal('El análisis fue cancelado.'); // Muestra un mensaje de alerta
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showAlertModal('Hubo un problema al cancelar el análisis.');
+      });
+  }
+}
+
 function displayFileDetails() {
   const fileInput = document.getElementById('file-input');
   const fileUploadBox = document.getElementById('file-upload-box');
@@ -313,6 +390,7 @@ let startTime; // Tiempo de inicio del procesamiento
 let lastProcessedVideo = null;
 
 function startProcessing() {
+  localStorage.setItem('processingStarted', 'true');
   const progressModal = document.getElementById('progress-modal');
   const fileInput = document.getElementById('file-input');
 
@@ -394,25 +472,6 @@ function finishProcessing() {
     completionModal.classList.remove('hidden'); // Mostrar el modal de finalización
 }
 
-function cancelProcessing() {
-    const confirmCancel = confirm("¿Estás seguro de cancelar el procesamiento?");
-    if (confirmCancel) {
-        clearInterval(processingInterval);
-        const progressModal = document.getElementById('progress-modal');
-        progressModal.classList.add('hidden'); // Oculta el modal de progreso
-
-        const progressBar = document.getElementById('progress-bar');
-        const progressPercentageText = document.getElementById('progress-percentage-text');
-        const progressPercentageBar = document.getElementById('progress-percentage-bar');
-        const estimatedTime = document.getElementById('estimated-time');
-
-        // Reinicia los valores
-        progressBar.style.width = '0%';
-        progressPercentageText.innerText = '0%';
-        progressPercentageBar.innerText = '0%';
-        estimatedTime.innerText = '00:00:00';
-    }
-}
 
 // Función para actualizar dinámicamente el tiempo estimado de finalización
 function updateEstimatedTime(newEstimatedTime) {
@@ -432,5 +491,7 @@ function redirectToResults() {
 
 // Recarga la página para subir otro video
 function uploadAnotherVideo() {
+  localStorage.removeItem('analysisCancelled');
+  localStorage.removeItem('processingStarted');
   window.location.reload();
 }

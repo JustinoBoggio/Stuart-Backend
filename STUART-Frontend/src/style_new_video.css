@@ -374,6 +374,10 @@ input {
   background-color: #0056b3;
 }
 
+#cancel-button {
+  margin-bottom: 10px; /* Añade margen inferior solo a este botón */
+}
+
 /* Responsive para pantallas menores a 900px */
 @media (max-width: 900px) {
   .main-container {
