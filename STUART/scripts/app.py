@@ -32,25 +32,6 @@ socketio = SocketIO(app, cors_allowed_origins="*", manage_session = True)
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'data', 'videos')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/session_test', methods=['GET', 'POST'])
-def session_test():
-    if request.method == 'POST':
-        session['test_key'] = 'test_value'
-        return jsonify({'message': 'Valor almacenado en sesión'}), 200
-    else:
-        value = session.get('test_key', 'No hay valor en sesión')
-        return jsonify({'session_value': value}), 200
-    
-@app.route('/check_session_email', methods=['GET'])
-def check_session_email():
-    # Recuperar el valor del correo electrónico de la sesión
-    print(f"Contenido de la sesión: {dict(session)}")
-    user_email = session.get('user_email', None)
-    if user_email:
-        return jsonify({'user_email': user_email}), 200
-    else:
-        return jsonify({'error': 'Correo electrónico no encontrado en sesión'}), 404
-
 @app.route('/upload_video', methods=['POST'])
 def upload_video():
     print("Ruta '/upload_video' llamada")
