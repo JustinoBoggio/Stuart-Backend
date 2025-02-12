@@ -1,4 +1,4 @@
-const socket = io('http://127.0.0.1:5000');
+const socket = io('http://localhost:5000');
 
 // Verifica cuando el cliente se conecta al servidor de WebSockets
 socket.on('connect', () => {
@@ -33,7 +33,7 @@ window.addEventListener('beforeunload', function (e) {
   // Solo marca la cancelación si el procesamiento había comenzado
   if (localStorage.getItem('processingStarted') === 'true') {
     localStorage.setItem('analysisCancelled', 'true');
-    fetch('http://127.0.0.1:5000/cancel_analysis', { method: 'POST' });
+    fetch('http://localhost:5000/cancel_analysis', { method: 'POST' });
   }
 });
 
@@ -51,7 +51,7 @@ window.addEventListener('load', function () {
 
 //Funciones para Dosis y Raza
 function loadBreeds() {
-  fetch('http://127.0.0.1:5000/api/breeds')
+  fetch('http://localhost:5000/api/breeds')
       .then(response => {
           if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -81,7 +81,7 @@ function loadBreeds() {
 }
 
 function loadDoses() {
-  fetch('http://127.0.0.1:5000/api/doses')
+  fetch('http://localhost:5000/api/doses')
       .then(response => {
           if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -201,9 +201,9 @@ function confirmModal() {
       const data = { name: value };
 
       if (currentAction === "breed") {
-          url = 'http://127.0.0.1:5000/api/add_breed';
+          url = 'http://localhost:5000/api/add_breed';
       } else if (currentAction === "dose") {
-          url = 'http://127.0.0.1:5000/api/add_dose';
+          url = 'http://localhost:5000/api/add_dose';
       }
 
       fetch(url, {
@@ -301,7 +301,7 @@ function cancelProcessing() {
     localStorage.removeItem('processingStarted');
 
     // Enviar solicitud al backend para cancelar el análisis
-    fetch('http://127.0.0.1:5000/cancel_analysis', { method: 'POST' })
+    fetch('http://localhost:5000/cancel_analysis', { method: 'POST' })
       .then(response => {
         if (!response.ok) {
           throw new Error('Error al cancelar el análisis');
@@ -420,9 +420,10 @@ function startProcessing() {
 
 
   // Luego, realiza la solicitud para cargar el video
-  fetch('http://127.0.0.1:5000/upload_video', {
+  fetch('http://localhost:5000/upload_video', {
     method: 'POST',
     body: formData,
+    credentials: 'include'
   })
   .then(response => response.json())
   .then(data => {

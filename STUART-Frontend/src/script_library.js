@@ -6,7 +6,7 @@ async function loadVideoList(filter = '') {
     videoListContainer.innerHTML = '';
     try {
         
-        const response = await fetch('http://127.0.0.1:5000/get_videos');
+        const response = await fetch('http://localhost:5000/get_videos');
         const videosData = await response.json();
         const filteredVideos = videosData.filter(video => video.name.toLowerCase().includes(filter.toLowerCase()));
 
@@ -112,7 +112,7 @@ function deleteVideo(videoName) {
     // Evento de confirmación
     confirmBtn.onclick = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:5000/delete_video/${encodeURIComponent(videoName)}`, {
+            const response = await fetch(`http://localhost:5000/delete_video/${encodeURIComponent(videoName)}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             });

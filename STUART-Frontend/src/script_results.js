@@ -60,7 +60,7 @@ function prevItem() {
 // Actualiza la tabla y los campos según la parte seleccionada
 async function updateData(bodyPart) {
   try {
-      const response = await fetch(`http://127.0.0.1:5000/get_results/${encodeURIComponent(videoName)}/${encodeURIComponent(bodyPart)}`);
+      const response = await fetch(`http://localhost:5000/get_results/${encodeURIComponent(videoName)}/${encodeURIComponent(bodyPart)}`);
       const data = await response.json();
 
       console.log("Datos recibidos:", data); // Debug: Ver JSON devuelto por el backend
@@ -110,7 +110,7 @@ async function updateData(bodyPart) {
 async function fetchTrajectoryImage(part) {
   try {
       // Asegurar que la imagen se obtiene del backend y no de una ruta local
-      const imgResponse = await fetch(`http://127.0.0.1:5000/get_trayectoria_image/${encodeURIComponent(videoName)}/${encodeURIComponent(part)}`);
+      const imgResponse = await fetch(`http://localhost:5000/get_trayectoria_image/${encodeURIComponent(videoName)}/${encodeURIComponent(part)}`);
 
       if (!imgResponse.ok) {
           throw new Error(`Error HTTP: ${imgResponse.status}`);

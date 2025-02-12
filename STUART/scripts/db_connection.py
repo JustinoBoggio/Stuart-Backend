@@ -2,11 +2,17 @@
 import pyodbc
 
 def get_db_connection():
-    # Configura los parámetros de conexión
-    server = 'AR-IT13485'  # por ejemplo, 'localhost' o '192.168.1.1'
-    database = 'STUART1'  # el nombre de tu base de datos
-    username = 'luz_audi'  # tu usuario de SQL Server
-    password = 'recibida2024'   # tu contraseña de SQL Server
+    #Luz
+    #server = 'AR-IT13485'  # por ejemplo, 'localhost' o '192.168.1.1'
+    #database = 'STUART1'  # el nombre de tu base de datos
+    #username = 'luz_audi'  # tu usuario de SQL Server
+    #password = 'recibida2024'   # tu contraseña de SQL Server
+
+    #Justino
+    server = 'DESKTOP-9M0HA0J\SQLSERVERJUSTINO'
+    database = 'STUART'
+    username = 'sa'
+    password = 'root'
 
     # Establecer la conexión
     try:

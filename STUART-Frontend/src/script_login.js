@@ -12,7 +12,8 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        credentials: 'include' // Esto es crucial para enviar cookies
       });
   
       const result = await response.json();
