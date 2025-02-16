@@ -3,20 +3,29 @@ import pyodbc
 
 def get_db_connection():
     #Luz
+    # driver = SQL Server
     #server = 'AR-IT13485'  # por ejemplo, 'localhost' o '192.168.1.1'
     #database = 'STUART1'  # el nombre de tu base de datos
     #username = 'luz_audi'  # tu usuario de SQL Server
     #password = 'recibida2024'   # tu contraseña de SQL Server
 
     #Justino
-    server = 'DESKTOP-9M0HA0J\SQLSERVERJUSTINO'
+    # driver = SQL Server
+    # server = 'DESKTOP-9M0HA0J\SQLSERVERJUSTINO'
+    # database = 'STUART'
+    # username = 'sa'
+    # password = 'root'
+
+    #Leonel
+    driver = '{ODBC Driver 17 for SQL Server}'
+    server = 'DESKTOP-LBNEVAD'
     database = 'STUART'
     username = 'sa'
-    password = 'root'
+    password = 'Lani01020608'
 
     # Establecer la conexión
     try:
-        conn = pyodbc.connect('Driver={SQL Server};'
+        conn = pyodbc.connect(f'Driver={driver};'
                               f'Server={server};'
                               f'Database={database};'
                               f'UID={username};'

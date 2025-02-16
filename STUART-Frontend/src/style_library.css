@@ -1,5 +1,5 @@
 .library-container {
-    max-width: 1200px;
+    max-width: 1500px;
     margin: 20px auto;
     padding: 20px;
     border: 1px solid #ccc;
@@ -40,7 +40,7 @@
 /* Encabezados de las columnas */
 .video-header {
     display: grid;
-    grid-template-columns: 50px 2fr 110px 130px 130px 150px; /* Ajusta las proporciones según los datos */
+    grid-template-columns: 50px 2fr 110px 130px 130px 100px 150px; /* Ajusta las proporciones según los datos */
     font-weight: bold;
     text-align: center; /* Centra horizontalmente el texto */
     padding: 10px 0;
@@ -58,7 +58,7 @@
 
 .video-item {
     display: grid;
-    grid-template-columns: 50px 2fr 110px 130px 130px 150px;
+    grid-template-columns: 50px 2fr 110px 130px 130px 100px 150px;
     align-items: center;
     padding: 10px 0;
     border-bottom: 1px solid #ddd;
@@ -72,8 +72,10 @@
 
 /* Ocultar columnas en resoluciones más pequeñas */
 @media (max-width: 1200px) {
-    .video-header div:nth-child(5), /* Columna "Dosis" */
-    .video-item div:nth-child(5) {
+    .video-header div:nth-child(5), /* Columna "Cantidad" */
+    .video-item div:nth-child(5),
+    .video-header div:nth-child(6), /* Columna "Dosis" */
+    .video-item div:nth-child(6){
         display: none;
     }
 

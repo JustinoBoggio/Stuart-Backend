@@ -222,20 +222,22 @@ function confirmModal() {
       .then(data => {
           console.log(data.message);
           if (currentAction === "breed") {
-              const breedSelect = document.getElementById('breed');
-              const newOption = document.createElement('option');
-              newOption.value = value;
-              newOption.textContent = value;
-              breedSelect.appendChild(newOption);
+              // const breedSelect = document.getElementById('breed');
+              // const newOption = document.createElement('option');
+              // newOption.value = value;
+              // newOption.textContent = value;
+              // breedSelect.appendChild(newOption);
               showSuccessModal(`Raza "${value}" agregada con éxito.`);
+              loadBreeds();
           } else if (currentAction === "dose") {
-              const doseList = document.getElementById('dose-list');
-              const newOption = document.createElement('option');
-              newOption.value = value;
-              newOption.textContent = value;
-              doseList.appendChild(newOption);
+              // const doseList = document.getElementById('dose-list');
+              // const newOption = document.createElement('option');
+              // newOption.value = value;
+              // newOption.textContent = value;
+              // doseList.appendChild(newOption);
               showSuccessModal(`Dosis "${value}" agregada con éxito.`);
-          }
+              loadDoses();
+          }          
           closeModal(); // Cierra el modal de entrada
       })
       .catch(error => {
@@ -486,7 +488,8 @@ function redirectToResults() {
       showErrorModal("No se ha encontrado un video procesado. Asegúrate de procesar un video primero.");
       return;
   }
-
+  localStorage.removeItem('analysisCancelled');
+  localStorage.removeItem('processingStarted');
   window.location.href = `results.html?video=${encodeURIComponent(lastProcessedVideo)}`;
 }
 

@@ -20,10 +20,11 @@
                 <div class="input-group">
                     <label for="breed">Raza:</label>
                     <div class="field-group">
-                        <select id="breed" name="breed">
-                            <!-- Opciones cargadas dinámicamente -->
+                        <select id="breed">
+                            <option value="raza1">Raza 1</option>
+                            <option value="raza2">Raza 2</option>
                         </select>
-                        <button type="button" onclick="openModal('breed')">+</button>
+                        <button class="add-button" type="button" onclick="openModal('breed')">+</button>
                     </div>
                 </div>
             
@@ -51,17 +52,18 @@
                     <div class="input-group">
                         <label for="dose-list">Dosis:</label>
                         <div class="field-group">
-                            <select id="dose-list" name="doseList">
-                                <!-- Opciones cargadas dinámicamente -->
+                            <select id="dose-list">
+                                <option value="dosis1">Dosis 1</option>
+                                <option value="dosis2">Dosis 2</option>
                             </select>
-                            <button type="button" onclick="openModal('dose')">+</button>
+                            <button class="add-button" type="button" onclick="openModal('dose')">+</button>
                         </div>
                     </div>
             
                     <!-- Campo Cantidad -->
                     <div class="input-group">
                         <label for="dose-amount">Cantidad:</label>
-                        <input type="number" step="0.01" id="dose-amount" placeholder="Cantidad (en decimales)">
+                        <input type="number" step="0.01" id="dose-amount" placeholder="Cantidad (en mililitros)">
                     </div>
                 </div>
             </div>
@@ -104,13 +106,12 @@
         <div class="modal-content">
             <div class="modal-header progressing">Procesando Video</div>
             <p><strong>Progreso:</strong> <span id="progress-percentage-text">0%</span> completado</p>
-            <p><strong>Tiempo estimado restante:</strong> <span id="estimated-time">00:00:00</span></p>    
+            <p><strong>Tiempo estimado restante:</strong> <span id="estimated-time">00:00:00</span></p>       
             <div class="progress-bar-container">
                 <div id="progress-bar" class="progress-bar">
                     <span id="progress-percentage-bar" class="progress-percentage">0%</span>
                 </div>
             </div>
-            <button id="cancel-button" class="modal-cancel" onclick="cancelProcessing()">Cancelar</button>   
         </div>
     </div>
 
