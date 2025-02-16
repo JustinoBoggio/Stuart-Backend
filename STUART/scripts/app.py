@@ -13,6 +13,12 @@ from db_connection import get_db_connection
 from save_db import get_or_create_raton_id, get_or_create_dosis_id
 import bcrypt  # Asegúrate de instalar bcrypt para manejar la verificación de contraseñas
 from io import BytesIO
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+import random
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -123,7 +129,7 @@ def get_doses():
         return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
 
     cursor = conn.cursor()
-    cursor.execute('SELECT idDosis, descripcion FROM Dosis')
+    cursor.execute('SELECT idDosis, descripcion FROM Dosis WHERE descripcion != \'Sin Dosis\' ')
     doses = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -274,7 +280,8 @@ def get_videos():
                 v.idVideo, 
                 r.sexo, 
                 rz.nombreRaza, 
-                d.descripcion 
+                d.descripcion,
+                v.cantidad
             FROM Video v
             JOIN Raton r ON v.idRaton = r.idRaton
             JOIN Raza rz ON r.idRaza = rz.idRaza
@@ -288,7 +295,8 @@ def get_videos():
                 "name": video[0],   # ID del video
                 "sex": video[1],    # Sexo del ratón
                 "race": video[2],   # Nombre de la raza
-                "dose": video[3] if video[3] else "Sin Dosis"  # Nombre de la sustancia o "Sin Dosis"
+                "dose": video[3], #if video[3] else "Sin Dosis"  # Nombre de la sustancia o "Sin Dosis"
+                "amount": video[4]
             })
 
         return jsonify(video_list)
@@ -422,6 +430,175 @@ def delete_video(video_name):
     finally:
         cursor.close()
         conn.close()
+
+#################################  Sección Recuperación de Contraseña #################################
+
+# 1) Ruta para verificar existencia de mail
+@app.route('/api/checkEmail', methods=['POST'])
+def check_email():
+    data = request.json
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'error': 'Debe proporcionar un correo'}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute('SELECT mail FROM Usuario WHERE mail = ?', (email,))
+        user = cursor.fetchone()
+
+        if user is None:
+            # No existe
+            return jsonify({'error': 'El correo no existe'}), 404
+        else:
+            # Existe
+            return jsonify({'message': 'El correo existe'}), 200
+
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# 2) Ruta para enviar correo con el código (recibe email y code)
+@app.route('/api/sendMail', methods=['POST'])
+def send_mail():
+    data = request.json
+    email = data.get('email')
+    code = data.get('code')
+
+    if not email or not code:
+        return jsonify({'error': 'Faltan datos: email o code'}), 400
+
+    # Enviar el correo
+    if enviar_correo_recovery(email, code):
+        return jsonify({'message': 'Correo enviado con éxito'}), 200
+    else:
+        return jsonify({'error': 'Error al enviar el correo'}), 500
+
+def enviar_correo_recovery(destinatario, code):
+    """
+    Envía un correo HTML usando la cuenta de Gmail 'stuart.ia.73@gmail.com'.
+    Retorna True si se envió con éxito, False si hubo error.
+    """
+    try:
+
+        # Obtener la fecha y hora actual
+        fecha_hora_actual = datetime.now()
+
+        # Formatear la fecha y hora
+        formato = fecha_hora_actual.strftime("%d-%m-%Y %H:%M:%S")
+
+        # Datos del remitente
+        gmail_user = 'stuart.ia.73@gmail.com'
+        gmail_password = 'asmi ssqw lvip fcxn'  # Código de Aplicación PC Leonel
+
+        # Crear mensaje
+        mensaje = MIMEMultipart('alternative')
+        mensaje['From'] = gmail_user
+        mensaje['To'] = destinatario
+        mensaje['Subject'] = "STUART - RECUPERACIÓN DE CONTRASEÑA"
+
+        # Cuerpo en HTML
+        html_content = f"""
+        <html>
+        <body style="background-color: #FFFFFF; font-family: Arial, Helvetica, Serif; font-size: 10pt; color: #808083;">
+        
+            <!-- Encabezado del correo -->
+        <h1 style="
+            background-color: #FFFFFF;
+            margin: 0;
+            padding-top: 1em;
+            text-align: center;
+            color: #FFFFFF;
+            font-family: Arial, sans-serif;
+            font-size: 16pt;
+        ">
+        <!-- LOGO CENTRADO SIN FONDO -->
+        <img 
+            src="cid:stuart_logo"
+            alt="Stuart Logo"
+            style="width: 250px; height: auto; border: none; display: block; margin: 0 auto;"
+        >
+        </h1>
+
+            <div style="margin-left: 1%;"> <br> <br>
+                <h2 style="background-color: #FFFFFF; margin: 0px; color: #3347ff; font-family: Arial, Helvetica, Serif; font-size: 12pt; padding: 0.1em; white-space: nowrap;"><b>CÓDIGO PARA RESTABLECIMIENTO DE CONTRASEÑA</b></h2> <br>
+                <p style="color: black; font-family: Arial, Helvetica, Serif; font-size: 11pt;">Usuario Solicitante: <b>{destinatario}</b></p>
+                <p style="color: black; font-family: Arial, Helvetica, Serif; font-size: 11pt;"> Fecha y Hora: <b>{formato}</b></p> </br>
+            </div>
+
+            <div style="background-color: #e6e8ff; margin: 1%;">
+                <div style="text-align: center;"><br>
+                    <p style="color: #3347ff; font-family: Arial, Helvetica, Serif; font-size: 14pt;"><b>CÓDIGO</b></p>
+                </div>
+                <div style="background-color: #3347ff; color: #FFFFFF; padding: 1%; margin: 1% 25%; margin-bottom: 1%; border-radius: 20px; text-align: center; overflow-x: auto;">
+                    <p style="color: White; font-family: Arial, Helvetica, Serif; font-size: 16pt;"><b>{code}</b></p>
+                </div> <br>
+            </div>
+            <div style="background-color: #3347ff; color: #FFFFFF; font-family: Arial, sans-serif; font-size: 11pt; text-align: center; padding: 2% 1% 2% 1%; position: fixed; left: 0; bottom: 0; margin: 1%; margin-left: 0.6%; width: 97%;">
+                <!-- unique-id: {code}... -->
+                <div> <b>Este código debe ser resguardado y tratado con discreción.</b> </div>
+            </div>
+        </body>
+
+        </html>
+        """
+
+        parte_html = MIMEText(html_content, 'html')
+        mensaje.attach(parte_html)
+
+        # Adjuntar la imagen
+        with open("./scripts/image/logoStuart.png", "rb") as img:
+            mime_img = MIMEImage(img.read(), name="logoStuart.png")
+            mime_img.add_header("Content-ID", "<stuart_logo>")  # CID debe estar entre <>
+            mime_img.add_header("Content-Disposition", "inline", filename="logoStuart.png")
+            mensaje.attach(mime_img)
+
+        # Enviar usando SMTP de Gmail
+        servidor = smtplib.SMTP('smtp.gmail.com', 587)
+        servidor.starttls()
+        servidor.login(gmail_user, gmail_password)
+        servidor.sendmail(gmail_user, destinatario, mensaje.as_string())
+        servidor.quit()
+        return True
+
+    except Exception as e:
+        print("Error al enviar correo:", e)
+        return False
+    
+@app.route('/api/UpdatePassword', methods=['POST'])
+def UpdatePassword_user():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email y contraseña son requeridos'}), 400
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'error': 'No se pudo conectar a la base de datos'}), 500
+
+    cursor = conn.cursor()
+    try:
+        # Encripta la contraseña antes de almacenarla
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        # Inserta el nuevo usuario
+        cursor.execute('UPDATE Usuario SET contraseña = ? WHERE mail = ? ;', (hashed_password.decode('utf-8'), email))
+        conn.commit()
+    except pyodbc.Error as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+    return jsonify({'message': 'Contraseña actualizada correctamente'}), 201
 
 
 @socketio.on('connect')

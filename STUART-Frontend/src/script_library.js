@@ -41,6 +41,15 @@ async function loadVideoList(filter = '') {
                 // Dosis
                 const videoDose = document.createElement('div');
                 videoDose.textContent = video.dose || 'N/A';
+
+                // Cantidad
+                const videoAmount = document.createElement('div');
+                if (video.amount === null || video.amount === undefined || video.amount == '') {
+                    videoAmount.textContent = 'N/A'
+                }
+                else{
+                    videoAmount.textContent = video.amount + ' ml' ;
+                }
     
                 // Acciones
                 const actionsContainer = document.createElement('div');
@@ -68,6 +77,7 @@ async function loadVideoList(filter = '') {
                 videoItem.appendChild(videoSex);
                 videoItem.appendChild(videoRace);
                 videoItem.appendChild(videoDose);
+                videoItem.appendChild(videoAmount);
                 videoItem.appendChild(actionsContainer);
     
                 // Agrega la fila de video al contenedor

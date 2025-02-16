@@ -85,11 +85,17 @@ def insert_video(video_name, id_raton, id_dosis, cantidad, mail_usuario):
             conn.commit()
             print(f"Video '{video_name}' existente eliminado.")
 
+        # Antes de llamar a la consulta, verificamos y convertimos la variable
+        if cantidad is None or cantidad == '':
+            cantidad_real = None
+        else:
+            cantidad_real = cantidad
+
         # Insertar el nuevo registro con los parámetros dinámicos
         cursor.execute("""
             INSERT INTO Video (idVideo, idRaton, idDosis, cantidad, mail_usuario)
             VALUES (?, ?, ?, ?, ?)
-        """, (video_name, id_raton, id_dosis, cantidad, mail_usuario))
+        """, (video_name, id_raton, id_dosis, cantidad_real, mail_usuario))
         conn.commit()
         print(f"Video '{video_name}' insertado correctamente.")
     except Exception as e:

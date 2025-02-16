@@ -7,27 +7,75 @@ const registeredEmails = ["usuario@ejemplo.com", "otro@ejemplo.com"];
 let generatedCode = "";
 let countdown;
 let timeLeft = 300; // 5 minutos en segundos
+let email;
 
 // Maneja el submit del formulario
-document.getElementById("recovery-form").addEventListener("submit", function(event) {
+document.getElementById("recovery-form").addEventListener("submit", async function(event) {
   event.preventDefault();
 
-  const email = document.getElementById("recovery-email").value;
+  // 1) Mostramos el modal de carga antes de comenzar el fetch
+  document.getElementById("loading-modal").style.display = "flex";
 
-  // Verifica si el email está en la base de datos simulada
-  if (!registeredEmails.includes(email)) {
-    // Muestra el modal de advertencia
-    document.getElementById("warning-modal").style.display = "flex";
-  } else {
-    // Genera el código de 6 dígitos
-    generatedCode = generateCode(6);
+  email = document.getElementById("recovery-email").value;
 
-    // Aquí se enviaría el correo con la librería adecuada
-    // simulación: console.log(`Enviando código a ${email}: ${generatedCode}`);
-    alert(`(Simulación) Código enviado a ${email}: ${generatedCode}`);
+  // 1) Verificamos la existencia del correo
+  try {
+    const responseCheck = await fetch('http://localhost:5000/api/checkEmail', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
 
-    // Muestra la ventana popUp de código
-    openCodePopup();
+    const resultCheck = await responseCheck.json();
+
+    if (!responseCheck.ok) {
+      // No existe o hay algún error
+      console.error(resultCheck.error);
+      //Ocultamos el modal de carga
+      document.getElementById("loading-modal").style.display = "none";
+      // Muestra el modal de advertencia
+      document.getElementById("warning-modal").style.display = "flex";
+      return;
+    }
+    else{
+      console.log(resultCheck.message); // 'El correo existe'
+
+      // 2) Generamos el código en el FRONT
+      const code = generateCode(6);
+      generatedCode = code;
+
+      // 3) Llamamos al endpoint para enviar el correo
+      const responseMail = await fetch('http://localhost:5000/api/sendMail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code }),
+      });
+
+      const resultMail = await responseMail.json();
+
+      if (responseMail.ok) {
+        // Éxito al enviar
+        console.log(resultMail.message);
+        // 5) Ahora que tenemos la respuesta de sendMail, ocultamos el modal de carga
+        document.getElementById("loading-modal").style.display = "none";
+        //alert(`Código enviado al correo: ${email}`);
+        document.getElementById("success-modal-SendMail").style.display = "flex";
+        // Aquí puedes abrir tu pop-up o redirigir
+        // Muestra la ventana popUp de código
+        openCodePopup();
+      } else {
+        // Error al enviar
+        console.error(resultMail.error);
+        // 5) Ahora que tenemos la respuesta de sendMail, ocultamos el modal de carga
+        document.getElementById("loading-modal").style.display = "none";
+        document.getElementById("error-modal-FailSend").style.display = "flex";
+        //alert(resultMail.error);
+      }
+    }
+  }
+  catch (error) {
+  console.error("Error de conexión:", error);
+  //alert("Error de conexión con el servidor");
   }
 });
 
@@ -92,22 +140,41 @@ function verifyCode() {
   }
 }
 
-// Actualiza la contraseña
-function updatePassword() {
+document.getElementById('new-pass-form').addEventListener('submit', async function(event) {
+  event.preventDefault();
   const newPass = document.getElementById("newPass").value;
   const confirmNewPass = document.getElementById("confirmNewPass").value;
 
   if (newPass === confirmNewPass && newPass !== "") {
     
-    // Almacenar las contraseñas en BD
-
-    document.getElementById('success-modal').style.display = 'flex';
-
+    try
+    {
+      const response = await fetch('http://localhost:5000/api/UpdatePassword', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email, password: newPass })
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok){
+        document.getElementById('success-modal').style.display = 'flex';
+      }
+      else{
+        document.getElementById("error-modal-ErroSavePassword").style.display = "flex";
+      }
+    }
+    catch(error)
+    {
+      document.getElementById("error-modal-ErroSavePassword").style.display = "flex";
+    }
   } else {
     // Muestra modal de error para contraseñas
     document.getElementById("error-modal").style.display = "flex";
   }
-}
+});
 
 // Cierra modal de éxito
 function closeModalSuccess(modalId) {
@@ -127,23 +194,4 @@ function closeModalTimenEnded(modalId) {
     // Cierra el popUp de Ingreso de Código
     document.getElementById("code-popup").style.display = "none";
 }
-
-// Abre el modal con mensaje personalizado
-// function openModal(action) {
-//     currentAction = action;
-//     const modal = document.getElementById('error-modal');
-//     const modalMessage = document.getElementById('modal-message');
-
-//     // Personaliza el mensaje
-//     if (action === "ErrorCode") {
-//         modalMessage.innerText = "El Código ingresado es incorrecto.";
-//     } else if (action === "ErrorPassword") {
-//         modalMessage.innerText = "Las contraseñas ingresadas no coinciden.";
-//     } else if (action === "ErrorTimeEnded") {
-//         modalMessage.innerText = "Se acabó el tiempo, por favor solicita un nuevo código.";
-//     }
-
-//     modalInput.value = ""; // Limpia el campo de entrada
-//     modal.style.display = "flex" // Muestra el modal
-// }
   

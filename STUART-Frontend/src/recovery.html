@@ -57,16 +57,18 @@
     <!-- PopUp para Nueva Contraseña -->
     <div id="new-pass-popup" class="popup hidden">
         <div class="popup-content">
-            <h3>ACTUALIZAR CONTRASEÑA</h3>
-            <label for="newPass">Nueva Contraseña</label>
-            <input type="password" id="newPass" placeholder="Nueva Contraseña" />
-            <label for="confirmNewPass">Repetir Nueva Contraseña</label>
-            <input
-            type="password"
-            id="confirmNewPass"
-            placeholder="Repetir Nueva Contraseña"
-            />
-            <button onclick="updatePassword()">Confirmar Cambio</button>
+            <form id="new-pass-form">
+                <h3>ACTUALIZAR CONTRASEÑA</h3>
+                <label for="newPass">Nueva Contraseña</label>
+                <input type="password" id="newPass" placeholder="Nueva Contraseña" />
+                <label for="confirmNewPass">Repetir Nueva Contraseña</label>
+                <input
+                type="password"
+                id="confirmNewPass"
+                placeholder="Repetir Nueva Contraseña"
+                />
+                <button type="submit">Confirmar Cambio</button>
+            </form>         
         </div>
     </div>
 
@@ -91,6 +93,34 @@
         <div class="modal-content success">
             <p>Contraseña actualizada exitosamente. Inicia sesión con tu nueva contraseña.</p>
             <button class="modal-close" onclick="closeModalSuccess('success-modal')">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="success-modal-SendMail" class="modal">
+        <div class="modal-content success">
+            <p>Código enviado al correo.</p>
+            <button class="modal-close" onclick="closeModal('success-modal-SendMail')">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Carga (Spinner) -->
+    <div id="loading-modal" class="modal">
+        <div class="modal-content">
+            <p>Procesando envío de código de recuperación...</p>
+        </div>
+    </div>
+
+    <div id="error-modal-FailSend" class="modal">
+        <div class="modal-content error">
+            <p id="modal-message">Error al enviar codigo de recuperación.</p>
+            <button class="modal-close" onclick="closeModal('error-modal-FailSend')">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="error-modal-ErroSavePassword" class="modal">
+        <div class="modal-content error">
+            <p id="modal-message">Error al guardar contraseña. Por favor intente nuevamente.</p>
+            <button class="modal-close" onclick="closeModal('error-modal-ErroSavePassword')">Cerrar</button>
         </div>
     </div>
 
