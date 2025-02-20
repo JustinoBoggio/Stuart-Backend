@@ -19,6 +19,7 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 import random
 from datetime import datetime
+import base64
 
 
 app = Flask(__name__)
@@ -382,6 +383,36 @@ def get_trayectoria_image(video_name, keypoint):
         image_stream = BytesIO(image_binary)
 
         return send_file(image_stream, mimetype='image/png')
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/get_trayectoria_image_base64/<video_name>/<keypoint>', methods=['GET'])
+def get_trayectoria_image_base64(video_name, keypoint):
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT mapaTrayectoria FROM Trayectoria
+            WHERE idVideo = ? AND descripcion = ?
+        """, (video_name, keypoint))
+        row = cursor.fetchone()
+
+        if not row or not row[0]:
+            return jsonify({"error": "Imagen no encontrada"}), 404
+
+        image_binary = row[0]  # Bytes de la imagen
+        # Convertir a base64
+        image_base64 = base64.b64encode(image_binary).decode('utf-8')
+
+        return jsonify({"image_base64": image_base64})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

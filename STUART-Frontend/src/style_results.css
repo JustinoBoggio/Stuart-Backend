@@ -212,6 +212,15 @@ input[readonly] {
   background-color: #27ae60;
 }
 
+.button.pdf {
+  background-color: #cacaca;
+  color: black;
+}
+
+.button.pdf:hover {
+  background-color: #b2b2b2;
+}
+
 /* --- Media Queries para hacer el diseño responsive --- */
 
 /* Pantallas menores a 800px */
@@ -272,4 +281,8 @@ input[readonly] {
     height: 30px;
     font-size: 1.5rem;
   }
+}
+
+.pdf-page {
+  page-break-after: always; /* fuerza un salto de página en PDF/impresión */
 }

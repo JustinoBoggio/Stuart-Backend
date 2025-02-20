@@ -408,6 +408,7 @@ def post_processing(keypoint_trajectories,
             'distance': distance_traveled.get(kp_name, 0.0),
             'map': trajectory_map,
             'area_central': keypoint_area_data.get(kp_name, {}).get('distance_inside', 0.0),
+            'time_ac': keypoint_area_data.get(kp_name, {}).get('time_inside', 0.0),
             'entries': keypoint_area_data.get(kp_name, {}).get('enter_count', 0),
             'exits': keypoint_area_data.get(kp_name, {}).get('exit_count', 0),
         })

@@ -153,6 +153,7 @@ def insert_results_to_db(distances, area_central_data, times_data, trajectory_da
             distance = traj.get('distance', 0.0)
             trajectory_image = traj.get('map', None)
             area_central_distance = traj.get('area_central', 0.0)
+            tiempo_area_central = traj.get('time_ac', 0.0)
             entries = traj.get('entries', 0)
             exits = traj.get('exits', 0)
 
@@ -161,8 +162,8 @@ def insert_results_to_db(distances, area_central_data, times_data, trajectory_da
                 continue
 
             cursor.execute("""
-                INSERT INTO Trayectoria (idVideo, mapaTrayectoria, distanciaRecorrida, descripcion, distanciaRecorrida_AC, nro_entrada_AC, nro_salida_AC)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO Trayectoria (idVideo, mapaTrayectoria, distanciaRecorrida, descripcion, distanciaRecorrida_AC, nro_entrada_AC, nro_salida_AC, tiempo_dentro_AC)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 id_video,
                 trajectory_image,
@@ -170,7 +171,8 @@ def insert_results_to_db(distances, area_central_data, times_data, trajectory_da
                 keypoint,
                 area_central_distance,
                 entries,
-                exits
+                exits,
+                tiempo_area_central
             ))
         print("Datos insertados correctamente en la tabla Trayectoria")
 
