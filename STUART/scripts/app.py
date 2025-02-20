@@ -309,6 +309,48 @@ def get_videos():
         cursor.close()
         conn.close()
 
+@app.route('/get_information/<video_name>', methods=['GET'])
+def get_information_by_video_name(video_name):
+    """
+    Obtiene la informacion de raza, dosis y cantidad de dosis aplicada.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+
+    try:
+        cursor = conn.cursor()
+        
+        # Obtener métricas generales filtradas por descripción (keypoint)
+        cursor.execute("""
+            SELECT rz.nombreRaza, r.sexo, d.descripcion, v.cantidad
+                FROM Video AS v 
+                INNER JOIN Raton AS r ON  r.idRaton = v.idRaton
+                INNER JOIN Raza AS rz ON rz.idRaza = r.idRaza
+                INNER JOIN Dosis AS d ON d.idDosis = v.idDosis 
+            WHERE v.idVideo = ?
+        """, (video_name))
+        info = cursor.fetchone()
+
+        # DEBUG: Ver qué devuelve la base de datos
+        print(f"Información del video {video_name}")
+
+        result_data = {
+            "raza": info[0] if info else '',
+            "sexo": info[1] if info else '',
+            "dosis": info[2] if info else '', 
+            "cantidad": info[3] if info else '' 
+        }
+
+        return jsonify(result_data)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/get_results/<video_name>/<keypoint>', methods=['GET'])
 def get_results_by_keypoint(video_name, keypoint):
     """
