@@ -80,10 +80,16 @@
       <!-- Botones finales -->
       <div class="button-container">
           <button class="button back" onclick="window.location.href='main.html'">Volver al Menú Inicial</button>
+          <!-- Botón para descargar el reporte -->
+          <button class="button pdf" onclick="downloadPDF()">Descargar Reporte</button>
           <button class="button new" onclick="window.location.href='new_video.html'">Procesar Nuevo Video</button>
       </div>
     </div>
 
+    <!-- Librería html2pdf.js desde un CDN -->
+    <!-- <script src="html2pdf.bundle.min.js"></script> -->
+    <script src="jspdf.js"></script>
+    <script src="jspdf-autotable.js"></script>
     <script src="script_results.js"></script>
     <script src="script.js"></script>
 </body>

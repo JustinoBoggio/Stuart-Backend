@@ -1,11 +1,11 @@
-// Obtener el nombre del video desde la URL
+/***********************************************************
+ * 1) OBTENER PARÁMETROS Y REFERENCIAS DEL DOM
+ ************************************************************/
 const urlParams = new URLSearchParams(window.location.search);
 const videoName = urlParams.get('video');
-
-// Asignar el nombre del video en la interfaz
 document.getElementById("video-name").textContent = videoName;
 
-// Lista de partes del ratón
+// Partes del ratón (carrusel) que renderizamos
 const bodyParts = [
   "Nariz",
   "Oreja Derecha",
@@ -20,28 +20,27 @@ const bodyParts = [
 // Índice actual del carrusel
 let currentIndex = 0;
 
-// Referencias a elementos HTML
+// Referencias en el DOM
 const carousel = document.querySelector(".carousel");
-const dataContainer = document.querySelector(".data-container");
+// Aquí asumes que existen .arrow.left y .arrow.right en tu HTML
 
+/***********************************************************
+ * 2) FUNCIONES PARA EL CARRUSEL
+ ************************************************************/
 function updateCarousel() {
   const carouselItems = document.querySelectorAll(".carousel-item");
-
   carouselItems.forEach((item, index) => {
     if (index === currentIndex) {
-      item.classList.add("active"); // Añade la clase para el ítem visible
+      item.classList.add("active");
     } else {
-      item.classList.remove("active"); // Quita la clase para los ítems no visibles
+      item.classList.remove("active");
     }
   });
-
-  // Actualiza los datos dinámicos (tabla, imagen, etc.)
+  // Al cambiar el carrusel, llamamos a updateData() para recargar la info
   const part = bodyParts[currentIndex];
   updateData(part);
 }
 
-
-// Avanza en el carrusel
 function nextItem() {
   if (currentIndex < bodyParts.length - 1) {
     currentIndex++;
@@ -49,7 +48,6 @@ function nextItem() {
   }
 }
 
-// Retrocede en el carrusel
 function prevItem() {
   if (currentIndex > 0) {
     currentIndex--;
@@ -57,90 +55,14 @@ function prevItem() {
   }
 }
 
-// Actualiza la tabla y los campos según la parte seleccionada
-async function updateData(bodyPart) {
-  try {
-      const response = await fetch(`http://localhost:5000/get_results/${encodeURIComponent(videoName)}/${encodeURIComponent(bodyPart)}`);
-      const data = await response.json();
-
-      console.log("Datos recibidos:", data); // Debug: Ver JSON devuelto por el backend
-
-      if (!data || data.error) {
-          console.error("Error en la respuesta del backend:", data ? data.error : "Respuesta vacía");
-          return;
-      }
-
-      // Actualizar la tabla de tiempos de curiosidad
-      const tableBody = document.querySelector(".table-container tbody");
-      tableBody.innerHTML = "";
-
-      if (data.times && data.times.length > 0) {
-          data.times.forEach(entry => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
-                  <td>${videoName}</td>
-                  <td>${bodyPart}</td>
-                  <td>${entry.object}</td>
-                  <td>${entry.time.toFixed(2)} segundos</td>
-              `;
-              tableBody.appendChild(row);
-          });
-
-          const totalTime = data.times.reduce((sum, entry) => sum + entry.time, 0).toFixed(2);
-          document.querySelector(".table-summary").textContent = `Tiempo total: ${totalTime} segundos`;
-      } else {
-          document.querySelector(".table-summary").textContent = `Tiempo total: 0.00 segundos`;
-      }
-
-      document.getElementById("total-distance").value = data.distance ? data.distance.toFixed(2) : "0.00";
-      document.getElementById("central-distance").value = data.central_distance ? data.central_distance.toFixed(2) : "0.00";
-      document.getElementById("central-time").value = data.central_time ? data.central_time.toFixed(2) : "0.00";
-      document.getElementById("central-entries").value = data.central_entries || "0";
-      document.getElementById("central-exits").value = data.central_exits || "0";
-
-      // Obtener imagen del mapa de trayectoria
-      await fetchTrajectoryImage(bodyPart);
-
-  } catch (error) {
-      console.error("Error al obtener los datos:", error);
-  }
-}
-
-// Función para obtener la imagen de trayectoria desde el backend
-async function fetchTrajectoryImage(part) {
-  try {
-      // Asegurar que la imagen se obtiene del backend y no de una ruta local
-      const imgResponse = await fetch(`http://localhost:5000/get_trayectoria_image/${encodeURIComponent(videoName)}/${encodeURIComponent(part)}`);
-
-      if (!imgResponse.ok) {
-          throw new Error(`Error HTTP: ${imgResponse.status}`);
-      }
-
-      const imgBlob = await imgResponse.blob();
-      const imgUrl = URL.createObjectURL(imgBlob);
-
-      const mapImageElement = document.getElementById("map-image");
-
-      if (!mapImageElement) {
-          console.error("Error: Elemento con id 'map-image' no encontrado en el HTML.");
-          return;
-      }
-
-      mapImageElement.src = imgUrl;
-  } catch (error) {
-      console.error("Error al obtener la imagen de trayectoria:", error);
-  }
-}
-
-// Inicialización
 function initialize() {
-  // Carga las partes del carrusel
-  const carouselItems = bodyParts
-    .map((part) => `<div class="carousel-item">${part}</div>`)
+  // Generamos todos los .carousel-item
+  const carouselItemsHTML = bodyParts
+    .map(part => `<div class="carousel-item">${part}</div>`)
     .join("");
-  carousel.innerHTML = carouselItems;
+  carousel.innerHTML = carouselItemsHTML;
 
-  // Actualiza el carrusel por primera vez
+  // Mostramos la primera parte
   updateCarousel();
 }
 
@@ -148,7 +70,335 @@ function initialize() {
 document.querySelector(".arrow.left").addEventListener("click", prevItem);
 document.querySelector(".arrow.right").addEventListener("click", nextItem);
 
-// Llama a la función de inicialización al cargar completamente el DOM
-document.addEventListener('DOMContentLoaded', (event) => {
+// Al cargar el DOM, inicializar
+document.addEventListener("DOMContentLoaded", () => {
   initialize();
 });
+
+/***********************************************************
+ * 3) FUNCIONES PARA MOSTRAR DATOS EN PANTALLA (updateData)
+ ************************************************************/
+
+/**
+ * Llama a tu endpoint /get_results/{video}/{bodyPart}
+ * para obtener los datos y llenar la tabla y campos
+ */
+async function updateData(bodyPart) {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/get_results/${encodeURIComponent(videoName)}/${encodeURIComponent(bodyPart)}`
+    );
+    const data = await response.json();
+    console.log("Datos recibidos:", data);
+
+    if (!data || data.error) {
+      console.error("Error en la respuesta del backend:", data?.error || "Vacío");
+      return;
+    }
+
+    // Llenar la tabla
+    const tableBody = document.querySelector(".table-container tbody");
+    tableBody.innerHTML = "";
+    if (data.times && data.times.length > 0) {
+      data.times.forEach(entry => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${videoName}</td>
+          <td>${bodyPart}</td>
+          <td>${entry.object}</td>
+          <td>${entry.time.toFixed(2)} segundos</td>
+        `;
+        tableBody.appendChild(row);
+      });
+      const totalTime = data.times.reduce((sum, e) => sum + e.time, 0).toFixed(2);
+      document.querySelector(".table-summary").textContent =
+        `Tiempo total: ${totalTime} segundos`;
+    } else {
+      document.querySelector(".table-summary").textContent =
+        "Tiempo total: 0.00 segundos";
+    }
+
+    // Rellenar los campos
+    document.getElementById("total-distance").value =
+      data.distance ? data.distance.toFixed(2) : "0.00";
+    document.getElementById("central-distance").value =
+      data.central_distance ? data.central_distance.toFixed(2) : "0.00";
+    document.getElementById("central-time").value =
+      data.central_time ? data.central_time.toFixed(2) : "0.00";
+    document.getElementById("central-entries").value =
+      data.central_entries || "0";
+    document.getElementById("central-exits").value =
+      data.central_exits || "0";
+
+    // Cargar la imagen para la vista principal
+    await fetchTrajectoryImage(bodyPart);
+
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+  }
+}
+
+/** 
+ * Genera un Blob URL de la imagen de trayectoria 
+ * dada la parte y el video
+ */
+async function fetchTrajectoryBlobURL(video, part) {
+  try {
+    const imgResponse = await fetch(
+      `http://localhost:5000/get_trayectoria_image/${encodeURIComponent(video)}/${encodeURIComponent(part)}`
+    );
+    if (!imgResponse.ok) {
+      throw new Error(`HTTP Error: ${imgResponse.status}`);
+    }
+    const imgBlob = await imgResponse.blob();
+    return URL.createObjectURL(imgBlob);
+  } catch (err) {
+    console.error("Error obteniendo imagen trayectoria:", err);
+    // Fallback local
+    return "images/Trayectoria_Base Cola_con_distancia.png";
+  }
+}
+
+/** 
+ * Asigna la imagen (para pantalla principal)
+ */
+async function fetchTrajectoryImage(bodyPart) {
+  try {
+    const imgUrl = await fetchTrajectoryBlobURL(videoName, bodyPart);
+    const mapImageElement = document.getElementById("map-image");
+    if (mapImageElement) {
+      mapImageElement.src = imgUrl;
+    } else {
+      console.warn("No se encontró #map-image en el DOM");
+    }
+  } catch (error) {
+    console.error("Error al asignar la imagen:", error);
+  }
+}
+
+async function fetchTrajectoryImageBase64(video, part) {
+  try {
+    const resp = await fetch(
+      `http://localhost:5000/get_trayectoria_image_base64/${encodeURIComponent(video)}/${encodeURIComponent(part)}`
+    );
+    const data = await resp.json();
+    if (data?.error) {
+      console.error("Error devolviendo imagen base64:", data.error);
+      // fallback
+      return "images/Trayectoria_Base Cola_con_distancia.png";
+    }
+    // Retornamos "data:image/png;base64,...."
+    return `data:image/png;base64,${data.image_base64}`;
+  } catch (error) {
+    console.error("Error en fetchTrajectoryImageBase64:", error);
+    return "images/Trayectoria_Base Cola_con_distancia.png";
+  }
+}
+
+/***********************************************************
+ * 4) FUNCIONES PARA DESCARGAR PDF (REPORTE)
+ ************************************************************/
+
+// (A) Pedir datos para una parte (reutilizamos lógica parecida a updateData)
+async function fetchDataForPart(part) {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/get_results/${encodeURIComponent(videoName)}/${encodeURIComponent(part)}`
+    );
+    const data = await response.json();
+    if (data?.error) {
+      console.error("Error en backend:", data.error);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error("Error fetchDataForPart:", error);
+    return null;
+  }
+}
+
+// (B) Construir tabla en HTML
+function buildCuriosityTable(times, part) {
+  if (!times || times.length === 0) {
+    return `
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre Video</th>
+            <th>Keypoint</th>
+            <th>Objeto</th>
+            <th>Tiempo Curiosidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="4">Sin datos</td></tr>
+        </tbody>
+      </table>
+    `;
+  }
+  let rows = "";
+  times.forEach(entry => {
+    rows += `
+      <tr>
+        <td>${videoName}</td>
+        <td>${part}</td>
+        <td>${entry.object}</td>
+        <td>${entry.time.toFixed(2)} seg</td>
+      </tr>
+    `;
+  });
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre Video</th>
+          <th>Keypoint</th>
+          <th>Objeto</th>
+          <th>Tiempo Curiosidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `;
+}
+
+function calculateTotalTime(times) {
+  if (!times || times.length === 0) return 0;
+  return times.reduce((sum, e) => sum + e.time, 0).toFixed(2);
+}
+
+/** 
+ * (C) buildPageForPart: construye el HTML de una “página” PDF 
+ */
+async function buildPageForPart(data, part) {
+  // Armamos la tabla, etc.
+  const timesHTML = buildCuriosityTable(data.times, part);
+  const totalTime = calculateTotalTime(data.times);
+
+  // [IMPORTANTE] Pedimos la imagen en base64 (no blob)
+  const base64Img = await fetchTrajectoryImageBase64(videoName, part);
+
+  return `
+    <h1 style="text-align:center;">Resultados: ${videoName} - [${part}]</h1>
+    <div style="display:flex; gap:20px; justify-content:space-between;">
+      <div style="flex:1;">
+        <!-- ... la tabla ... -->
+        ${timesHTML}
+        <div><b>Tiempo total:</b> ${totalTime} seg</div>
+        <!-- ... etc. ... -->
+      </div>
+      <div style="flex:1; text-align:center;">
+        <h2>Mapa de trayectoria</h2>
+        <img src="${base64Img}" style="width:400px;" alt="Trayectoria"/>
+      </div>
+    </div>`;
+}
+
+/** 
+ * (D) Función principal para DESCARGAR PDF 
+ */
+async function downloadPDF() {
+  try {
+    const { jsPDF } = window.jspdf; // Asegúrate de haber incluido la librería jsPDF
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "pt", // points
+      format: "letter",
+    });
+
+    for (let i = 0; i < bodyParts.length; i++) {
+      const part = bodyParts[i];
+      const data = await fetchDataForPart(part);
+      if (!data) continue;
+
+      // Imagen en Base64 (para el PDF)
+      const base64Img = await fetchTrajectoryImageBase64(videoName, part);
+
+      // Nueva página si no es la primera
+      if (i > 0) doc.addPage();
+
+      // ======= 1) Título Principal (grande y en bold) =======
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text(`Resultados: ${videoName} - [${part}]`, 40, 40);
+
+      // ======= 2) Subtítulo “Tiempos de Curiosidad” =======
+      doc.setFontSize(14); // Subtítulo (manténlo igual para “Mapa de trayectoria”)
+      doc.setFont("helvetica", "bold");
+      // Ajusta la Y para bajarlo más (ej. 100) si quieres todavía más espacio
+      doc.text("Tiempos de Curiosidad", 40, 100);
+
+      // ======= 3) Generar la tabla con AutoTable “más abajo” =======
+      let bodyRows = [];
+      if (data.times && data.times.length > 0) {
+        bodyRows = data.times.map((entry) => [
+          videoName,
+          part,
+          entry.object,
+          `${entry.time.toFixed(2)} segundos`,
+        ]);
+      }
+
+      doc.autoTable({
+        startY: 150, // Ajusta para que quede más abajo
+        margin: { left: 40, top: 50 },
+        tableWidth: 300, // Ancho de la tabla
+        theme: "grid",
+        head: [
+          [
+            "Nombre Video",
+            "Keypoint",
+            "Objeto de interés",
+            "Tiempo de Curiosidad",
+          ],
+        ],
+        body: bodyRows,
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontStyle: "bold",
+        },
+        styles: {
+          font: "helvetica",
+          fontSize: 10,
+          cellPadding: 5,
+        },
+      });
+
+      // ======= 4) Campos debajo de la tabla (en negrita) =======
+      let finalY = doc.lastAutoTable.finalY + 40;
+      const totalTime = (data.times || []).reduce((acc, e) => acc + e.time, 0).toFixed(2);
+
+      // Ponemos en negrita
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+
+      const leftX = 40;
+      doc.text(`Tiempo total: ${totalTime} seg`, leftX, finalY);
+      finalY += 14;
+      doc.text(`Distancia Total Recorrida: ${data.distance?.toFixed(2) || "0.00"} m`, leftX, finalY);
+      finalY += 14;
+      doc.text(`Distancia Total Recorrida en Área Central: ${data.central_distance?.toFixed(2) || "0.00"} m`, leftX, finalY);
+      finalY += 14;
+      doc.text(`Tiempo dentro de Área Central: ${data.central_time?.toFixed(2) || "0.00"} seg`, leftX, finalY);
+      finalY += 14;
+      doc.text(`N° de entradas Área Central: ${data.central_entries || "0"}`, leftX, finalY);
+      finalY += 14;
+      doc.text(`N° de salidas Área Central: ${data.central_exits || "0"}`, leftX, finalY);
+
+      // ======= 5) Subtítulo e imagen a la derecha =======
+      doc.setFontSize(14); // Mismo tamaño que “Tiempos de Curiosidad”
+      doc.setFont("helvetica", "bold");
+      doc.text("Mapa de trayectoria", 400, 100);
+      // Insertar la imagen base64 en X=400, Y=80, ancho=300, alto=300 (ajusta a gusto)
+      doc.addImage(base64Img, "PNG", 360, 110, 400, 400);
+    }
+
+    // 10) Guardar
+    doc.save(`Reporte_${videoName}.pdf`);
+  } catch (err) {
+    console.error("Error generando PDF con jsPDF y AutoTable:", err);
+  }
+}
