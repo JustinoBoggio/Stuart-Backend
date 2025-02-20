@@ -217,6 +217,23 @@ async function fetchDataForPart(part) {
   }
 }
 
+async function fetchDataVideo() {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/get_information/${encodeURIComponent(videoName)}`
+    );
+    const data = await response.json();
+    if (data?.error) {
+      console.error("Error en backend:", data.error);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error("Error fetchDataVideo:", error);
+    return null;
+  }
+}
+
 // (B) Construir tabla en HTML
 function buildCuriosityTable(times, part) {
   if (!times || times.length === 0) {
@@ -308,6 +325,15 @@ async function downloadPDF() {
       format: "letter",
     });
 
+    const informationVideo = await fetchDataVideo();
+    // Normalizamos los campos
+    const raza = informationVideo?.raza || "";
+    const sexo = informationVideo?.sexo || "";
+    const dosis = informationVideo?.dosis || "";
+    // Si "cantidad" está vacía o nula => "N/A", si no => "val ml"
+    const cantidadRaw = informationVideo?.cantidad ?? "";
+    const cantidadText = cantidadRaw ? `${cantidadRaw} ml` : "N/A";
+
     for (let i = 0; i < bodyParts.length; i++) {
       const part = bodyParts[i];
       const data = await fetchDataForPart(part);
@@ -324,13 +350,36 @@ async function downloadPDF() {
       doc.setFontSize(16);
       doc.text(`Resultados: ${videoName} - [${part}]`, 40, 40);
 
+      // ====== [B] Subtítulo “Información del video” ======
+      // Ocupa todo el ancho => lo centramos en la página (letter ~ 792 px de ancho, 612 en horizontal).
+      // Podemos usar doc.internal.pageSize.width para el ancho total, y /2 para la mitad, con { align: "center" }.
+      const pageWidth = doc.internal.pageSize.width;
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Información del Video", pageWidth / 2, 80, { align: "center" });
+
+      // 3) Campos Raza, Dosis, Cantidad en horizontal
+      //   (mantemos el mismo Y, pero distintos X)
+      const infoY = 110; // la altura donde los situamos
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+
+      doc.text(`Raza del ratón: ${raza}`, 40, infoY);     // Izq
+      doc.text(`Sexo: ${sexo}`, 300, infoY); 
+      doc.text(`Dosis: ${dosis}`, 480, infoY);           // un poco más a la derecha
+      doc.text(`Cantidad: ${cantidadText}`, 640, infoY); // más a la derecha
+
+      // Dejamos un espacio adicional debajo
+      let nextY = infoY + 70;
+
       // ======= 2) Subtítulo “Tiempos de Curiosidad” =======
       doc.setFontSize(14); // Subtítulo (manténlo igual para “Mapa de trayectoria”)
       doc.setFont("helvetica", "bold");
       // Ajusta la Y para bajarlo más (ej. 100) si quieres todavía más espacio
-      doc.text("Tiempos de Curiosidad", 40, 100);
+      doc.text("Tiempos de Curiosidad", 40, nextY);
 
       // ======= 3) Generar la tabla con AutoTable “más abajo” =======
+      let tableY = nextY + 40;
       let bodyRows = [];
       if (data.times && data.times.length > 0) {
         bodyRows = data.times.map((entry) => [
@@ -342,7 +391,7 @@ async function downloadPDF() {
       }
 
       doc.autoTable({
-        startY: 150, // Ajusta para que quede más abajo
+        startY: tableY, // Ajusta para que quede más abajo
         margin: { left: 40, top: 50 },
         tableWidth: 300, // Ancho de la tabla
         theme: "grid",
@@ -391,9 +440,9 @@ async function downloadPDF() {
       // ======= 5) Subtítulo e imagen a la derecha =======
       doc.setFontSize(14); // Mismo tamaño que “Tiempos de Curiosidad”
       doc.setFont("helvetica", "bold");
-      doc.text("Mapa de trayectoria", 400, 100);
+      doc.text("Mapa de trayectoria", 400, nextY);
       // Insertar la imagen base64 en X=400, Y=80, ancho=300, alto=300 (ajusta a gusto)
-      doc.addImage(base64Img, "PNG", 360, 110, 400, 400);
+      doc.addImage(base64Img, "PNG", 360, nextY + 5 , 400, 400);
     }
 
     // 10) Guardar
