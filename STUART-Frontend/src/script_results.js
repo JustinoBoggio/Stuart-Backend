@@ -258,7 +258,7 @@ function buildCuriosityTable(times, part) {
     rows += `
       <tr>
         <td>${videoName}</td>
-        <td>${part}</td>
+        <td>Nariz</td>
         <td>${entry.object}</td>
         <td>${entry.time.toFixed(2)} seg</td>
       </tr>
@@ -384,7 +384,7 @@ async function downloadPDF() {
       if (data.times && data.times.length > 0) {
         bodyRows = data.times.map((entry) => [
           videoName,
-          part,
+          'Nariz',
           entry.object,
           `${entry.time.toFixed(2)} segundos`,
         ]);
