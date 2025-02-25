@@ -104,7 +104,7 @@ async function updateData(bodyPart) {
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${videoName}</td>
-          <td>${bodyPart}</td>
+          <td>Nariz</td>
           <td>${entry.object}</td>
           <td>${entry.time.toFixed(2)} segundos</td>
         `;
