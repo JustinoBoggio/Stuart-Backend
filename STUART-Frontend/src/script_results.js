@@ -220,8 +220,10 @@ async function fetchDataForPart(part) {
 async function fetchDataVideo() {
   try {
     const response = await fetch(
-      `http://localhost:5000/get_information/${encodeURIComponent(videoName)}`
-    );
+      `http://localhost:5000/get_information/${encodeURIComponent(videoName)}`, {
+        method: 'GET',
+        credentials: 'include'  // <-- Importante
+      });
     const data = await response.json();
     if (data?.error) {
       console.error("Error en backend:", data.error);
@@ -334,6 +336,10 @@ async function downloadPDF() {
     const cantidadRaw = informationVideo?.cantidad ?? "";
     const cantidadText = cantidadRaw ? `${cantidadRaw} ml` : "N/A";
 
+    const user = informationVideo?.usuario || "";
+    const fecha = informationVideo?.fecha || "";
+    const hora = informationVideo?.hora || "";
+
     for (let i = 0; i < bodyParts.length; i++) {
       const part = bodyParts[i];
       const data = await fetchDataForPart(part);
@@ -443,6 +449,33 @@ async function downloadPDF() {
       doc.text("Mapa de trayectoria", 400, nextY);
       // Insertar la imagen base64 en X=400, Y=80, ancho=300, alto=300 (ajusta a gusto)
       doc.addImage(base64Img, "PNG", 360, nextY + 5 , 400, 400);
+    }
+
+    const totalPages = doc.getNumberOfPages();
+    for (let page = 1; page <= totalPages; page++) {
+      doc.setPage(page); // situarnos en esa página
+
+      const pageWidth = doc.internal.pageSize.width;
+      const pageHeight = doc.internal.pageSize.height;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+
+      // Texto horizontal con reporte y fecha/hora
+      doc.text(
+        `Reporte generado por: ${user}   -   Fecha: ${fecha}   -   Hora: ${hora}`,
+        pageWidth / 2,
+        pageHeight - 30,
+        { align: "center" }
+      );
+
+      // Número de página centrado debajo
+      doc.text(
+        `Página ${page} de ${totalPages}`,
+        pageWidth / 2,
+        pageHeight - 15,
+        { align: "center" }
+      );
     }
 
     // 10) Guardar
