@@ -312,11 +312,19 @@ def get_videos():
 @app.route('/get_information/<video_name>', methods=['GET'])
 def get_information_by_video_name(video_name):
     """
-    Obtiene la informacion de raza, dosis y cantidad de dosis aplicada.
+    Obtiene la informacion de raza, dosis y cantidad de dosis aplicada, mail usuario y fecha y hora.
     """
     conn = get_db_connection()
     if conn is None:
         return jsonify({"error": "No se pudo conectar a la base de datos"}), 500
+
+    print(f"Contenido de la sesión: {dict(session)}")
+    
+    mail_usuario = session.get('user_email')
+    now = datetime.now()
+    # Formatea la fecha (YYYY-MM-DD) y hora (HH:MM:SS)
+    fecha_generacion = now.strftime("%d/%m/%Y")
+    hora_generacion = now.strftime("%H:%M:%S")
 
     try:
         cursor = conn.cursor()
@@ -339,7 +347,10 @@ def get_information_by_video_name(video_name):
             "raza": info[0] if info else '',
             "sexo": info[1] if info else '',
             "dosis": info[2] if info else '', 
-            "cantidad": info[3] if info else '' 
+            "cantidad": info[3] if info else '',
+            "usuario":  mail_usuario,
+            "fecha": fecha_generacion,
+            "hora": hora_generacion
         }
 
         return jsonify(result_data)

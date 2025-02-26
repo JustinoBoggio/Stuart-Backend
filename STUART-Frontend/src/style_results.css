@@ -151,7 +151,7 @@ h1.text {
   margin-top: 7%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 1rem;
 }
 
 .field-group {
@@ -162,6 +162,10 @@ h1.text {
 
 .field-group label {
   font-weight: bold;
+  display: flex;
+  align-items: center; /* Centra verticalmente */
+  justify-content: center; /* Opcional: también centra horizontalmente */
+  margin: 0;
 }
 
 .field-group input {
@@ -170,6 +174,13 @@ h1.text {
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #f9f9f9;
+}
+
+.field-group p {
+  display: flex;
+  align-items: center; /* Centra verticalmente */
+  justify-content: center; /* Opcional: también centra horizontalmente */
+  margin: 0;
 }
 
 input[readonly] {
